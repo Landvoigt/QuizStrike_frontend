@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { NavigationService } from '../services/navigation.service';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -8,4 +10,6 @@ import { Component } from '@angular/core';
 })
 export class Menu {
 
+  constructor(public navigationService: NavigationService) { }
+  
 }

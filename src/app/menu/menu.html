@@ -1,1 +1,11 @@
-<p>menu works!</p>
+<div class="flex flex-col justify-center items-center h-screen w-full gap-12 bg-[#1c1c1c]">
+    <button (click)="navigationService.game()" class="flex justify-center items-center h-24 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
+        text-3xl text-[#d47108] font-bold pointer">
+        Play
+    </button>
+    <button (click)="navigationService.score()" class="flex justify-center items-center h-24 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
+        text-3xl text-[#d47108] font-bold pointer">
+        Scoreboard
+    </button>
+
+</div>
