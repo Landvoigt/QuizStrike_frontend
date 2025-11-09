@@ -1,14 +1,14 @@
 import { Routes } from '@angular/router';
-import { Menu } from './menu/menu';
-import { Game } from './game/game';
-import { Score } from './score/score';
+import { MenuComponent } from './menu/menu';
+import { GameComponent } from './game/game';
+import { ScoreComponent } from './score/score';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'menu', pathMatch: 'full' },
 
-    { path: 'menu', component: Menu },
-    { path: 'game', component: Game },
-    { path: 'score', component: Score },
+    { path: 'menu', component: MenuComponent },
+    { path: 'game', component: GameComponent },
+    { path: 'score', component: ScoreComponent },
 
     { path: '**', redirectTo: 'menu' },
 ];

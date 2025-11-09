@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment.prod';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Quiz } from '../interfaces/quiz.interface';
-import { Score } from '../score/score';
+import { Quiz, Score } from '../interfaces/quiz.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +12,11 @@ export class RestService {
 
   constructor(private http: HttpClient) { }
 
-  getQuiz(): Observable<Quiz[]> {
+  getQuizzes(): Observable<Quiz[]> {
     return this.http.get<Quiz[]>(`${this.apiBaseUrl}quiz/`);
   }
 
-  getScoreboard(): Observable<Score[]> {
+  getScores(): Observable<Score[]> {
     return this.http.get<Score[]>(`${this.apiBaseUrl}score/`);
   }
 

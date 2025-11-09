@@ -1,0 +1,12 @@
+.score-updated {
+    animation: glow 0.5s ease-in-out;
+}
+
+@keyframes glow {
+    0% {
+        box-shadow: 0 0 10px #ffd27f;
+    }
+    100% {
+        box-shadow: none;
+    }
+}
