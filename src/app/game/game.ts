@@ -1,46 +1,106 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { NgClass } from '@angular/common';
 import { interval, Subscription } from 'rxjs';
-import { Question, Quiz } from '../interfaces/quiz.interface';
+import { Answer, Question, Quiz } from '../interfaces/quiz.interface';
 import { GameService } from '../services/game.service';
 
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [NgClass],
+  imports: [],
   templateUrl: './game.html',
   styleUrl: './game.scss',
 })
 export class GameComponent implements OnInit, OnDestroy {
   selectedQuiz: Quiz | null = null;
-  queue: Question[] = [];
 
+  questions: Question[] = [];
   currentQuestionIndex: number = 0;
+  queue: Question[] = [];
+  currentQueueIndex: number = 0;
+
   step: number = 0;
 
-  isFlipping = false;
-  
-  formattedTime = '00.000';
+  isQuestionSide: boolean = false;
+  isFlipping: boolean = false;
+
+  formattedTime: string = '00.000';
   startTime!: number;
   timerSubscription?: Subscription;
   timeRunning: boolean = false;
+  timePaused: boolean = false;
 
-  get flipRotation(): string {
-    return `rotateX(${this.step * 180}deg)`;
-  }
+  flipRotation = 'rotateX(0deg)';
+
+  selectedAnswerIdx: number | null = null;
+  selectedAnswerCorrect: boolean | null = null;
+  correctAnswerIdx: number | null = null;
+  showCorrectAnswer: boolean = false;
 
   constructor(private game: GameService, private cdr: ChangeDetectorRef) { }
 
   ngOnInit() {
-    this.game.selectedQuiz$.subscribe(sq => {
-      if (!sq) return;
+    this.game.selectedQuiz$.subscribe(quiz => {
+      if (!quiz) return;
 
-      this.selectedQuiz = sq;
-      this.queue = this.getQueue();
-      console.log(this.queue);
+      this.selectedQuiz = quiz;
+      this.questions = this.getQueue();
+      this.queue = [...this.questions];
+
+      console.log(this.questions);
       this.cdr.detectChanges();
     });
+  }
 
+  clearAll() {
+    this.selectedAnswerIdx = null;
+    this.selectedAnswerCorrect = null;
+    this.correctAnswerIdx = null;
+    this.showCorrectAnswer = false;
+    this.formattedTime = '00.000';
+    this.timeRunning = false;
+    this.timePaused = false;
+    this.cdr.detectChanges();
+  }
+
+  nextStep() {
+    if (this.timerSubscription) {
+      if (this.isFlipping || this.timeRunning) return;
+    } else {
+      this.clearAll();
+
+      this.isFlipping = true;
+
+      if (this.isQuestionSide) {
+        this.nextQueue();
+      } else {
+        this.nextQuestion();
+      }
+
+      this.step++;
+      this.flipRotation = `rotateX(${this.step * 180}deg)`;
+      this.isQuestionSide = !this.isQuestionSide;
+    }
+  }
+
+  nextQuestion() {
+    if (this.currentQuestionIndex < this.queue.length - 1) {
+      this.currentQuestionIndex++;
+    }
+    this.isFlipping = false;
+    this.cdr.detectChanges();
+
+    setTimeout(() => {
+      this.startTimer();
+      this.cdr.detectChanges();
+    }, 700);
+  }
+
+  nextQueue() {
+    if (this.currentQueueIndex < this.queue.length - 1) {
+      this.currentQueueIndex++;
+    }
+    this.isFlipping = false;
+    this.cdr.detectChanges();
   }
 
   startTimer() {
@@ -61,6 +121,13 @@ export class GameComponent implements OnInit, OnDestroy {
 
       if (elapsed >= 10000) {
         this.stopTimer();
+
+        if (!this.selectedAnswerIdx) {
+          this.correctAnswerIdx = this.questions[this.currentQuestionIndex].answers.findIndex(a => a.correct);
+          this.selectedAnswerCorrect = false;
+          this.showCorrectAnswer = true;
+          this.cdr.detectChanges();
+        }
       }
     });
   }
@@ -69,15 +136,36 @@ export class GameComponent implements OnInit, OnDestroy {
     if (this.timerSubscription) {
       this.timerSubscription.unsubscribe();
       this.timerSubscription = undefined;
+      this.timePaused = true;
     }
   }
 
   answer(idx: number) {
-    this.stopTimer();
-  }
+    if (this.timePaused) return;
 
-  stopTimerManually(): void {
+    this.sendResponse(idx);
+
     this.stopTimer();
+
+    const answers = this.questions[this.currentQuestionIndex].answers;
+    const selectedAnswer = answers[idx];
+
+    this.selectedAnswerIdx = idx;
+    this.correctAnswerIdx = answers.findIndex(a => a.correct);
+    this.selectedAnswerCorrect = selectedAnswer.correct;
+
+    console.log('Answered:', this.answer);
+
+    if (!this.selectedAnswerCorrect) {
+      this.showCorrectAnswer = true;
+      this.cdr.detectChanges();
+
+      // setTimeout(() => {
+      //   this.showCorrectAnswer = false;
+      // }, 1500);
+    }
+
+    // this.nextStep();
   }
 
   private pad(num: number, size: number = 2): string {
@@ -86,22 +174,7 @@ export class GameComponent implements OnInit, OnDestroy {
     return s;
   }
 
-  nextStep() {
-    if (this.isFlipping) return;
-    this.isFlipping = true;
-
-    this.step++;
-
-    setTimeout(() => {
-      if (this.step > 0 && this.step % 2 === 0 && this.currentQuestionIndex < this.queue.length - 1) {
-        this.currentQuestionIndex++;
-      }
-      this.isFlipping = false;
-      this.cdr.detectChanges();
-    }, 700);
-  }
-
-  sendResponse(answerIndex: number) {
+  sendResponse(answerIdx: number) {
 
   }
 

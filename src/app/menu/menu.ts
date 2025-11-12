@@ -4,7 +4,7 @@ import { Overlay } from '../overlay/overlay';
 
 @Component({
   selector: 'app-menu',
-  imports: [Overlay],
+  // imports: [Overlay],
   templateUrl: './menu.html',
   styleUrl: './menu.scss',
 })
@@ -17,7 +17,7 @@ export class MenuComponent {
     this.overlayVisible = true;
     setTimeout(() => {
       this.navigationService.game();
-    }, 4000);
+    }, 1000);
   }
 
 }

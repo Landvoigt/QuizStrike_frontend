@@ -13,6 +13,16 @@
     animation-iteration-count: calc(10s / 0.3s);
 }
 
+.timer-paused {
+    animation-play-state: paused !important;
+}
+
+.timer-paused::before,
+.timer-paused::after {
+    display: none;
+    animation-play-state: paused !important;
+}
+
 .loader {
     width: 0;
     height: 8px;
@@ -99,14 +109,41 @@
     backface-visibility: hidden;
 }
 
-.rotate-y-180 {
-    transform: rotateY(180deg);
-}
-
 .rotate-x-180 {
     transform: rotateX(180deg);
 }
 
 .transition-transform {
     transition: transform 0.7s ease-in-out;
+}
+
+.highlight-green {
+    background-color: #14a536;
+    transition:
+        background-color 255ms ease-in-out,
+        border-color 255ms ease-in-out;
+}
+
+.highlight-red {
+    background-color: #ac1423;
+    transition:
+        background-color 255ms ease-in-out,
+        border-color 255ms ease-in-out;
+}
+
+.highlight-blue {
+    background-color: #1e90ff;
+    animation: blink 1s linear infinite alternate 1.5s;
+}
+
+@keyframes blink {
+    70% {
+        background-color: #1e90ff;
+    }
+    85% {
+        background-color: #383838b6;
+    }
+    100% {
+        background-color: #1e90ff;
+    }
 }
