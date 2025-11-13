@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment.prod';
+import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Quiz, Score } from '../interfaces/quiz.interface';
+import { Game, Quiz, Score, ResponseModel } from '../interfaces/quiz.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +20,11 @@ export class RestService {
     return this.http.get<Score[]>(`${this.apiBaseUrl}score/`);
   }
 
-  saveResponse(response: Response): Observable<any> {
+  getGame(data: { name: string; quizId: number | null }): Observable<Game> {
+    return this.http.post<Game>(`${this.apiBaseUrl}player/`, data);
+  }
+
+  saveResponse(response: ResponseModel): Observable<any> {
     return this.http.post(`${this.apiBaseUrl}response/`, response);
   }
 

@@ -4,27 +4,57 @@
         <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d"
             [style.transform]="flipRotation">
 
+            @if(startScreen) {
             <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
-                shadow-[inset_0_0_0_5px_#d47108] text-white backface-hidden" (click)="nextStep()">
+                shadow-[inset_0_0_0_5px_#d47108] text-white backface-hidden cursor-pointer" (click)="startGame()">
+                <div class="z-100 flex flex-col justify-center items-center gap-4 p-48 text-center">
+                    <span class="text-3xl mb-4">
+                        {{ game?.quiz?.title }}
+                    </span>
+                    <span class="text-xl">
+                        {{ game?.remaining_questions?.length }} Fragen
+                    </span>
+                </div>
+            </div>
+            } @else {
+            <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
+                shadow-[inset_0_0_0_5px_#d47108] text-white backface-hidden" (click)="nextStep()"
+                [class.cursor-pointer]="!timerSubscription">
                 @if (!isQuestionSide) {
                 <div class="z-100 flex flex-col justify-center items-center gap-4 p-48 text-center">
                     <span class="text-3xl mb-4">
-                        Frage {{ currentQuestionIndex + 1 }} / {{ queue.length }}
+                        Frage {{ currentQuestionIndex + 1 + (game?.answered_questions?.length ?? 0) }} / {{
+                        questions.length + (game?.answered_questions?.length ?? 0) }}
+                    </span>
+                    <span class="text-3xl mb-4">
+                        {{ questions[currentQuestionIndex]?.category_title }}
+                    </span>
+                    <span class="text-3xl mb-4">
+                        {{ questions[currentQuestionIndex]?.title }}
                     </span>
                 </div>
                 }
             </div>
 
             <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
-                shadow-[inset_0_0_0_5px_#d47108] text-white rotate-x-180 backface-hidden" (click)="nextStep()">
+                shadow-[inset_0_0_0_5px_#d47108] text-white rotate-x-180 backface-hidden" (click)="nextStep()"
+                [class.cursor-pointer]="!timerSubscription">
                 @if (isQuestionSide) {
                 <div class="flex flex-col justify-center items-center gap-4 p-48 text-center">
+                    <span class="text-3xl mb-4">
+                        Frage {{ currentQuestionIndex + 1 + (game?.answered_questions?.length ?? 0) }} / {{
+                        questions.length + (game?.answered_questions?.length ?? 0) }}
+                    </span>
+                    <span class="text-3xl mb-4">
+                        {{ questions[currentQuestionIndex]?.category_title }}
+                    </span>
                     <span class="text-3xl">
                         {{ questions[currentQuestionIndex]?.title }}
                     </span>
                 </div>
                 }
             </div>
+            }
         </div>
     </div>
 
@@ -36,21 +66,20 @@
         <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d"
             [style.transform]="flipRotation">
 
+            @if(startScreen) {
             <div class="absolute w-full h-full flex flex-col justify-center items-start bg-[#d47108] border-4 border-[#d47108] 
                 rounded-[16rem] shadow-[inset_0_0_0_5px_#1c1c1c] backface-hidden">
-                @if (!isQuestionSide) {
-                }
             </div>
-
+            } @else {
             <div class="absolute w-full h-full flex flex-col justify-center items-start
-                bg-[#1c1c1c] rounded-[16rem] rotate-x-180 backface-hidden">
-                @if (isQuestionSide) {
+                bg-[#1c1c1c] rounded-[16rem] backface-hidden">
+                @if (!isQuestionSide) {
                 <div class="relative grid grid-cols-2 grid-rows-2 h-96 w-full gap-4 place-items-center">
 
                     <!-- Answer 0 -->
                     <div (click)="answer(0)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
                         rounded-[16rem] rounded-tr-3xl rounded-bl-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
-                        [class.cursor-pointer]="!timePaused || !timeRunning" 
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
                         [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
                         [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
                         [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
@@ -61,7 +90,7 @@
                     <!-- Answer 1 -->
                     <div (click)="answer(1)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
                         rounded-[16rem] rounded-tl-3xl rounded-br-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
-                        [class.cursor-pointer]="!timePaused || !timeRunning" 
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
                         [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
                         [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
                         [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
@@ -72,7 +101,7 @@
                     <!-- Answer 2 -->
                     <div (click)="answer(2)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
                         rounded-[16rem] rounded-br-3xl rounded-tl-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
-                        [class.cursor-pointer]="!timePaused || !timeRunning" 
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
                         [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
                         [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
                         [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
@@ -83,7 +112,7 @@
                     <!-- Answer 3 -->
                     <div (click)="answer(3)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
                         rounded-[16rem] rounded-bl-3xl rounded-tr-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
-                        [class.cursor-pointer]="!timePaused || !timeRunning" 
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
                         [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
                         [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
                         [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
@@ -100,6 +129,64 @@
                 }
             </div>
 
+            <div class="absolute w-full h-full flex flex-col justify-center items-start
+                bg-[#1c1c1c] rounded-[16rem] rotate-x-180 backface-hidden">
+                @if (isQuestionSide) {
+                <div class="relative grid grid-cols-2 grid-rows-2 h-96 w-full gap-4 place-items-center">
+
+                    <!-- Answer 0 -->
+                    <div (click)="answer(0)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
+                        rounded-[16rem] rounded-tr-3xl rounded-bl-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
+                        [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
+                        [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
+                        [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
+                        <span class="text-2xl text-white">{{ questions[currentQuestionIndex]?.answers?.[0]?.text
+                            }}</span>
+                    </div>
+
+                    <!-- Answer 1 -->
+                    <div (click)="answer(1)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
+                        rounded-[16rem] rounded-tl-3xl rounded-br-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
+                        [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
+                        [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
+                        [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
+                        <span class="text-2xl text-white">{{ questions[currentQuestionIndex]?.answers?.[1]?.text
+                            }}</span>
+                    </div>
+
+                    <!-- Answer 2 -->
+                    <div (click)="answer(2)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
+                        rounded-[16rem] rounded-br-3xl rounded-tl-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
+                        [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
+                        [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
+                        [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
+                        <span class="text-2xl text-white">{{ questions[currentQuestionIndex]?.answers?.[2]?.text
+                            }}</span>
+                    </div>
+
+                    <!-- Answer 3 -->
+                    <div (click)="answer(3)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
+                        rounded-[16rem] rounded-bl-3xl rounded-tr-3xl shadow-[inset_0_0_0_5px_#1c1c1c] transition"
+                        [class.cursor-pointer]="!timePaused || !timeRunning"
+                        [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
+                        [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
+                        [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
+                        <span class="text-2xl text-white">{{ questions[currentQuestionIndex]?.answers?.[3]?.text
+                            }}</span>
+                    </div>
+
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div class="flex justify-center items-center text-4xl text-white font-bold">
+                            <span class="counter">{{ formattedTime }}</span>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            }
         </div>
     </div>
 

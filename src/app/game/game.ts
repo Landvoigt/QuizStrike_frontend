@@ -1,7 +1,8 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { interval, Subscription } from 'rxjs';
-import { Answer, Question, Quiz } from '../interfaces/quiz.interface';
+import { Answer, Game, Question, ResponseModel } from '../interfaces/quiz.interface';
 import { GameService } from '../services/game.service';
+import { RestService } from '../services/rest.service';
 
 @Component({
   selector: 'app-game',
@@ -11,12 +12,12 @@ import { GameService } from '../services/game.service';
   styleUrl: './game.scss',
 })
 export class GameComponent implements OnInit, OnDestroy {
-  selectedQuiz: Quiz | null = null;
+  startScreen: boolean = true;
+
+  game: Game | null = null;
 
   questions: Question[] = [];
-  currentQuestionIndex: number = 0;
-  queue: Question[] = [];
-  currentQueueIndex: number = 0;
+  currentQuestionIndex: number = -1;
 
   step: number = 0;
 
@@ -36,17 +37,13 @@ export class GameComponent implements OnInit, OnDestroy {
   correctAnswerIdx: number | null = null;
   showCorrectAnswer: boolean = false;
 
-  constructor(private game: GameService, private cdr: ChangeDetectorRef) { }
+  constructor(private gameService: GameService, private cdr: ChangeDetectorRef, private rest: RestService) { }
 
-  ngOnInit() {
-    this.game.selectedQuiz$.subscribe(quiz => {
-      if (!quiz) return;
-
-      this.selectedQuiz = quiz;
+  ngOnInit(): void {
+    this.gameService.game$.subscribe((game) => {
+      if (!game) return;
+      this.game = game;
       this.questions = this.getQueue();
-      this.queue = [...this.questions];
-
-      console.log(this.questions);
       this.cdr.detectChanges();
     });
   }
@@ -62,6 +59,11 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  startGame() {
+    this.startScreen = false;
+    this.nextStep();
+  }
+
   nextStep() {
     if (this.timerSubscription) {
       if (this.isFlipping || this.timeRunning) return;
@@ -71,7 +73,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.isFlipping = true;
 
       if (this.isQuestionSide) {
-        this.nextQueue();
+        this.nextQuestion();
       } else {
         this.nextQuestion();
       }
@@ -83,7 +85,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   nextQuestion() {
-    if (this.currentQuestionIndex < this.queue.length - 1) {
+    if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex++;
     }
     this.isFlipping = false;
@@ -93,14 +95,6 @@ export class GameComponent implements OnInit, OnDestroy {
       this.startTimer();
       this.cdr.detectChanges();
     }, 700);
-  }
-
-  nextQueue() {
-    if (this.currentQueueIndex < this.queue.length - 1) {
-      this.currentQueueIndex++;
-    }
-    this.isFlipping = false;
-    this.cdr.detectChanges();
   }
 
   startTimer() {
@@ -143,39 +137,40 @@ export class GameComponent implements OnInit, OnDestroy {
   answer(idx: number) {
     if (this.timePaused) return;
 
-    this.sendResponse(idx);
-
     this.stopTimer();
 
-    const answers = this.questions[this.currentQuestionIndex].answers;
-    const selectedAnswer = answers[idx];
+    const question = this.questions[this.currentQuestionIndex];
+    const selectedAnswer = question.answers[idx];
 
     this.selectedAnswerIdx = idx;
-    this.correctAnswerIdx = answers.findIndex(a => a.correct);
+    this.correctAnswerIdx = question.answers.findIndex(a => a.correct);
     this.selectedAnswerCorrect = selectedAnswer.correct;
 
-    console.log('Answered:', this.answer);
+    this.sendResponse(selectedAnswer, question);
 
     if (!this.selectedAnswerCorrect) {
       this.showCorrectAnswer = true;
       this.cdr.detectChanges();
-
-      // setTimeout(() => {
-      //   this.showCorrectAnswer = false;
-      // }, 1500);
     }
-
-    // this.nextStep();
   }
 
-  private pad(num: number, size: number = 2): string {
-    let s = num.toString();
-    while (s.length < size) s = '0' + s;
-    return s;
-  }
+  sendResponse(answer: Answer, question: Question) {
+    if (!this.game) return;
 
-  sendResponse(answerIdx: number) {
+    const elapsedTime = Date.now() - this.startTime;
+    const cappedElapsed = Math.min(elapsedTime, question.time);
 
+    const response = new ResponseModel({
+      player_name: localStorage.getItem('QuizStrike_player') ?? '',
+      question_id: question.id,
+      answer_id: answer.id,
+      time: cappedElapsed
+    });
+
+    this.rest.saveResponse(response).subscribe({
+      next: () => console.log('Response saved', response),
+      error: (err) => console.error('Error saving response', err)
+    });
   }
 
   ngOnDestroy() {
@@ -183,12 +178,18 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   getQueue(): Question[] {
-    return this.selectedQuiz?.questions
+    return this.game?.remaining_questions
       ?.map(q => ({
         ...q,
         answers: [...q.answers].sort(() => Math.random() - 0.5)
       }))
       .sort(() => Math.random() - 0.5) ?? [];
+  }
+
+  private pad(num: number, size: number = 2): string {
+    let s = num.toString();
+    while (s.length < size) s = '0' + s;
+    return s;
   }
 
 }

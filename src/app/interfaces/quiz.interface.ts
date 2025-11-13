@@ -14,6 +14,7 @@ export interface Question {
     title: string;
     description: string;
     categoryId: number;
+    category_title: string;
     time: number;
     points: number;
     image: string;
@@ -44,7 +45,7 @@ export interface Category {
 
 export interface Score {
     id: number;
-    quizId: number;         
+    quizId: number;
     player: number;
     score: number;
     time: number;
@@ -61,9 +62,33 @@ export interface Response {
     created_at: string;
 }
 
+export class ResponseModel {
+    player_name: string;
+    question_id: number;
+    answer_id: number;
+    time: number;
+
+    constructor(data: { player_name: string; question_id: number; answer_id: number; time?: number }) {
+        this.player_name = data.player_name;
+        this.question_id = data.question_id;
+        this.answer_id = data.answer_id;
+        this.time = data.time ?? 0;
+    }
+}
+
 export interface Player {
     id: number;
     name: string;
     active: boolean;
     created_at: string;
+}
+
+export interface Game {
+    exists: boolean;
+    player_id: number;
+    score_id: number;
+    quiz_completed: boolean;
+    answered_questions: number[];
+    remaining_questions: Question[];
+    quiz: Quiz;
 }
