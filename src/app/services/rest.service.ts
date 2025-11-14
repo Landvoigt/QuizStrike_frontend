@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Game, Quiz, Score, ResponseModel } from '../interfaces/quiz.interface';
+
+import * as Interfaces from '../interfaces';
+import * as Models from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -12,19 +14,19 @@ export class RestService {
 
   constructor(private http: HttpClient) { }
 
-  getQuizzes(): Observable<Quiz[]> {
-    return this.http.get<Quiz[]>(`${this.apiBaseUrl}quiz/`);
+  getQuizzes(): Observable<Interfaces.Quiz[]> {
+    return this.http.get<Interfaces.Quiz[]>(`${this.apiBaseUrl}quiz/`);
   }
 
-  getScores(): Observable<Score[]> {
-    return this.http.get<Score[]>(`${this.apiBaseUrl}score/`);
+  getScores(): Observable<Interfaces.Score[]> {
+    return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}score/`);
   }
 
-  getGame(data: { name: string; quizId: number | null }): Observable<Game> {
-    return this.http.post<Game>(`${this.apiBaseUrl}player/`, data);
+  getGame(data: { name: string; quizId: number | null }): Observable<Interfaces.Game> {
+    return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}player/`, data);
   }
 
-  saveResponse(response: ResponseModel): Observable<any> {
+  saveResponse(response: Models.ResponseModel): Observable<any> {
     return this.http.post(`${this.apiBaseUrl}response/`, response);
   }
 

@@ -3,17 +3,14 @@ button {
   position: relative;
   font-size: inherit;
   font-family: inherit;
-//   color: white;
   padding: 0.5em 1em;
   outline: none;
-//   border: none;
-//   background-color: hsl(236, 32%, 26%);
   overflow: hidden;
   cursor: pointer;
 }
 
 button::after {
-  content: '';
+  content: "";
   z-index: -1;
   background-color: hsla(0, 0%, 100%, 0.2);
   position: absolute;

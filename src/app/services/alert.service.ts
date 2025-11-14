@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { Alert } from '../interfaces/alert.interface';
+
+import * as Interfaces from '../interfaces';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertService {
-  private alertSubject = new BehaviorSubject<Alert | null>(null);
+  private alertSubject = new BehaviorSubject<Interfaces.Alert | null>(null);
 
-  getAlert(): Observable<Alert | null> {
+  getAlert(): Observable<Interfaces.Alert | null> {
     return this.alertSubject.asObservable();
   }
 

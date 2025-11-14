@@ -1,9 +1,10 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { RestService } from '../services/rest.service';
 import { ErrorService } from '../services/error.service';
-import { Score } from '../interfaces/quiz.interface';
 import { NavigationService } from '../services/navigation.service';
 import { interval, Subscription } from 'rxjs';
+
+import * as Interfaces from '../interfaces';
 
 @Component({
   selector: 'app-score',
@@ -12,7 +13,7 @@ import { interval, Subscription } from 'rxjs';
   styleUrl: './score.scss',
 })
 export class ScoreComponent implements OnInit, OnDestroy {
-  scores: Score[] = [];
+  scores: Interfaces.Score[] = [];
   private refreshSub?: Subscription;
 
   constructor(
@@ -34,7 +35,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
     });
   }
 
-  private onScoresLoaded(data: Score[]): void {
+  onScoresLoaded(data: Interfaces.Score[]): void {
     if (this.scores.length === data.length) {
       for (let i = 0; i < data.length; i++) {
         const old = this.scores[i];

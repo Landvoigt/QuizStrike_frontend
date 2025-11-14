@@ -1,102 +1,4 @@
-.timer-animation {
-    animation: animFw 10s linear forwards;
-}
-
-.timer-animation::after,
-.timer-animation::before {
-    animation: coli1 0.3s linear;
-    animation-iteration-count: calc(10s / 0.3s);
-}
-
-.timer-animation::before {
-    animation: coli2 0.3s linear;
-    animation-iteration-count: calc(10s / 0.3s);
-}
-
-.timer-paused {
-    animation-play-state: paused !important;
-}
-
-.timer-paused::before,
-.timer-paused::after {
-    display: none;
-    animation-play-state: paused !important;
-}
-
-.loader {
-    width: 0;
-    height: 8px;
-    display: inline-block;
-    position: relative;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-    box-sizing: border-box;
-    left: 0;
-    transform-origin: left;
-    border-radius: 2.5rem;
-}
-.loader::after,
-.loader::before {
-    content: "";
-    width: 10px;
-    height: 1px;
-    background: #fff;
-    position: absolute;
-    top: 9px;
-    right: -2px;
-    opacity: 0;
-    transform: rotate(-45deg) translateX(0px);
-    box-sizing: border-box;
-}
-.loader::before {
-    top: -4px;
-    transform: rotate(45deg);
-}
-
-@keyframes animFw {
-    0% {
-        width: 0;
-    }
-    100% {
-        width: 100%;
-    }
-}
-
-@keyframes coli1 {
-    0% {
-        transform: rotate(-45deg) translateX(0px);
-        opacity: 0.7;
-    }
-    100% {
-        transform: rotate(-45deg) translateX(-45px);
-        opacity: 0;
-    }
-}
-
-@keyframes coli2 {
-    0% {
-        transform: rotate(45deg) translateX(0px);
-        opacity: 1;
-    }
-    100% {
-        transform: rotate(45deg) translateX(-45px);
-        opacity: 0.7;
-    }
-}
-
-.counter {
-    animation: fadeIn 500ms ease-in-out;
-}
-
-@keyframes fadeIn {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-
+// Defaults
 .perspective {
     perspective: 1000px;
 }
@@ -117,6 +19,65 @@
     transition: transform 0.7s ease-in-out;
 }
 
+// Time Progress Bar
+.time-progress {
+    width: 0;
+    height: 8px;
+    display: inline-block;
+    position: relative;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    box-sizing: border-box;
+    left: 0;
+    transform-origin: left;
+    border-radius: 2.5rem;
+}
+
+.time-progress::after,
+.time-progress::before {
+    content: "";
+    width: 10px;
+    height: 1px;
+    background: #fff;
+    position: absolute;
+    top: 9px;
+    right: -2px;
+    opacity: 0;
+    transform: rotate(-45deg) translateX(0px);
+    box-sizing: border-box;
+}
+
+.time-progress::before {
+    top: -4px;
+    transform: rotate(45deg);
+}
+
+.time-progress-animation {
+    animation: forwProg 10s linear forwards;
+}
+
+.time-progress-animation::after,
+.time-progress-animation::before {
+    animation: upwSprink 0.3s linear;
+    animation-iteration-count: calc(10s / 0.3s);
+}
+
+.time-progress-animation::before {
+    animation: dowSprink 0.3s linear;
+    animation-iteration-count: calc(10s / 0.3s);
+}
+
+.time-progress-paused {
+    animation-play-state: paused !important;
+}
+
+.time-progress-paused::before,
+.time-progress-paused::after {
+    display: none;
+    animation-play-state: paused !important;
+}
+
+// Answers
 .highlight-green {
     background-color: #14a536;
     transition:
@@ -132,18 +93,64 @@
 }
 
 .highlight-blue {
+    // background-color: #1e90ff;
     background-color: #1e90ff;
-    animation: blink 1s linear infinite alternate 1.5s;
+    // animation: blink 1.5s linear infinite alternate 2.5s;
+}
+
+.counter {
+    animation: fadeIn 500ms ease-in-out;
+}
+
+// Keyframes
+@keyframes forwProg {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
+}
+
+@keyframes upwSprink {
+    0% {
+        transform: rotate(-45deg) translateX(0px);
+        opacity: 0.7;
+    }
+    100% {
+        transform: rotate(-45deg) translateX(-45px);
+        opacity: 0;
+    }
+}
+
+@keyframes dowSprink {
+    0% {
+        transform: rotate(45deg) translateX(0px);
+        opacity: 1;
+    }
+    100% {
+        transform: rotate(45deg) translateX(-45px);
+        opacity: 0.7;
+    }
 }
 
 @keyframes blink {
-    70% {
+    0% {
         background-color: #1e90ff;
     }
-    85% {
+    10% {
         background-color: #383838b6;
     }
-    100% {
+    20% {
         background-color: #1e90ff;
+    }
+}
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }

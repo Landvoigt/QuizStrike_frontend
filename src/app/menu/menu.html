@@ -1,30 +1,28 @@
-<div class="flex flex-col justify-center items-center h-screen w-full gap-12 bg-[#1c1c1c]">
-
+<div class="flex flex-col justify-center items-center h-screen w-full gap-12 bg-[#1c1c1c] text-white">
     @if (showInput) {
-    <input [(ngModel)]="playerName" type="text" placeholder="Your name..." class="h-12 w-96 bg-[#2c2c2c] border-4 border-[#d47108] rounded-full 
-                   text-2xl text-[#d47108] font-bold px-4 focus:outline-none" />
-    <button (click)="register()" type="button"
-        class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
-        Registrieren
-    </button>
+        <input [(ngModel)]="playerName" type="text" placeholder="Your name..." class="h-12 w-96 bg-[#2c2c2c] border-4 border-[#d47108] rounded-full 
+            text-2xl text-[#d47108] font-bold px-4 focus:outline-none" />
+        <button (click)="register()" type="button"
+            class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
+            Registrieren
+        </button>
     } 
     @if (game && !showInput) {
-    <button (click)="play()" type="button"
-        class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
-        {{ game.quiz_completed ? 'Quiz completed - Back' : game.answered_questions.length ? 'Continue' : 'Play' }}
-    </button>
+        <button (click)="play()" type="button"
+            class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
+            {{ game.quiz_completed ? 'Quiz completed - Back' : game.answered_questions.length ? 'Continue' : 'Play' }}
+        </button>
     } 
     @if (!game && !showInput) {
-    @for(quiz of gameService.quizzes$ | async; track quiz.id) {
-    <button (click)="selectQuiz(quiz)" class="flex justify-center items-center h-24 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
+        @for(quiz of gameService.quizzes$ | async; track quiz.id) {
+            <button (click)="selectQuiz(quiz)" class="flex justify-center items-center h-24 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
+                text-3xl text-[#d47108] font-bold pointer">
+                {{ quiz.title }}
+            </button>
+        }
+        <button (click)="nav.score()" class="flex justify-center items-center h-24 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
             text-3xl text-[#d47108] font-bold pointer">
-        {{ quiz.title }}
-    </button>
+            Scoreboard
+        </button>
     }
-    <button (click)="nav.score()" class="flex justify-center items-center h-24 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
-                   text-3xl text-[#d47108] font-bold pointer">
-        Scoreboard
-    </button>
-    }
-
 </div>
