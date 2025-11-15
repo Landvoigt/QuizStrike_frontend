@@ -1,26 +1,34 @@
 button {
-  z-index: 1;
-  position: relative;
-  font-size: inherit;
-  font-family: inherit;
-  padding: 0.5em 1em;
-  outline: none;
-  overflow: hidden;
-  cursor: pointer;
+    z-index: 1;
+    position: relative;
+    outline: none;
+    border: 6px solid #1c1c1c;
+    background-color: #1c1c1c;
+    overflow: hidden;
+    transition: all 350ms ease-in-out;
+    box-shadow: 0 0 0 4px #d47108;
 }
 
-button::after {
-  content: "";
-  z-index: -1;
-  background-color: hsla(0, 0%, 100%, 0.2);
-  position: absolute;
-  top: -50%;
-  bottom: -50%;
-  width: 1.5em;
-  transform: translate3d(-1225%, 0, 0) rotate(35deg);
+button::before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background-color: #d47108;
+    transform-origin: center;
+    transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 0);
+    transition: transform 425ms ease-in-out;
 }
 
-button:hover::after {
-  transition: transform 0.45s ease-in-out;
-  transform: translate3d(1225%, 0, 0) rotate(35deg);
+button:hover {
+    cursor: pointer;
+    color: #1c1c1c;
+}
+
+button:hover::before {
+    transform: translate3d(-50%, -50%, 0) scale3d(20, 20, 20);
 }

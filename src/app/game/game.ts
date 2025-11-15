@@ -102,6 +102,8 @@ export class GameComponent implements OnInit, OnDestroy {
   nextQuestion(): void {
     if (this.currentQuestionIndex < this.questions.length - 1) {
       this.currentQuestionIndex++;
+    } else {
+      this.nav.menu();
     }
 
     this.isFlipping = false;
@@ -137,7 +139,7 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendResponse(answer: Interfaces.Answer, question: Interfaces.Question): void {
+  sendResponse(answer: Interfaces.Answer | null, question: Interfaces.Question): void {
     if (!this.game) return;
 
     const elapsedTime = Date.now() - this.startTime;
@@ -186,6 +188,8 @@ export class GameComponent implements OnInit, OnDestroy {
       this.selectedAnswerCorrect = false;
       this.showCorrectAnswer = true;
       this.cdr.detectChanges();
+
+      this.sendResponse(null, question);
     }
   }
 
@@ -215,11 +219,11 @@ export class GameComponent implements OnInit, OnDestroy {
       .sort(() => Math.random() - 0.5) ?? [];
   }
 
-  buildResponse(answer: Interfaces.Answer, question: Interfaces.Question, time: number): Models.ResponseModel {
+  buildResponse(answer: Interfaces.Answer | null, question: Interfaces.Question, time: number): Models.ResponseModel {
     return new Models.ResponseModel({
       player_name: localStorage.getItem('QuizStrike_player') ?? '',
       question_id: question.id,
-      answer_id: answer.id,
+      answer_id: answer?.id ?? null,
       time: time
     });
   }

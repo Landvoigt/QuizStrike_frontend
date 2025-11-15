@@ -7,3 +7,8 @@ body {
 ::-webkit-scrollbar {
     display: none;
 }
+
+.antialiazed {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}

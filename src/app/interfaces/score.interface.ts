@@ -1,7 +1,9 @@
+import { Player } from "./player.interface";
+
 export interface Score {
     id: number;
     quizId: number;
-    player: number;
+    player: Player;
     score: number;
     time: number;
     created_at: string;
