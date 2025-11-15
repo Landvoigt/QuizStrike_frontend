@@ -1,28 +1,30 @@
-<div class="flex flex-col justify-center items-center h-screen w-full gap-12 bg-[#1c1c1c] text-white">
-    @if (showInput) {
-        <input [(ngModel)]="playerName" type="text" placeholder="Your name..." class="h-12 w-96 bg-[#2c2c2c] border-4 border-[#d47108] rounded-full 
-            text-2xl text-[#d47108] font-bold px-4 focus:outline-none" />
-        <button (click)="register()" type="button"
-            class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
-            Registrieren
-        </button>
-    } 
-    @if (game && !showInput && !game.quiz_completed) {
-        <button (click)="play()" type="button"
-            class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
-            {{ game.answered_questions.length ? 'Continue' : 'Play' }}
-        </button>
-    } 
-    @if (!game && !showInput || game?.quiz_completed) {
-        @for(quiz of gameService.quizzes$ | async; track quiz.id) {
-            <button (click)="selectQuiz(quiz)" class="flex justify-center items-center h-22 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
+<div class="bg-[#2c2c2c] bg-stripes h-full w-full flex">
+    <div class="flex flex-col justify-center items-center h-screen w-full gap-12 text-white">
+        @if (showInput) {
+            <input [(ngModel)]="playerName" type="text" placeholder="Your name..." class="h-12 w-96 bg-[#2c2c2c] border-4 border-[#d47108] rounded-full 
+                text-2xl text-[#d47108] font-bold px-4 focus:outline-none" />
+            <button (click)="register()" type="button"
+                class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
+                Registrieren
+            </button>
+        } 
+        @if (game && !showInput && !game.quiz_completed) {
+            <button (click)="play()" type="button"
+                class="flex justify-center items-center h-16 w-48 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full">
+                {{ game.answered_questions.length ? 'Continue' : 'Play' }}
+            </button>
+        } 
+        @if (!game && !showInput || game?.quiz_completed) {
+            @for(quiz of gameService.quizzes$ | async; track quiz.id) {
+                <button (click)="selectQuiz(quiz)" class="flex justify-center items-center h-22 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
+                    text-2xl leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
+                    {{ quiz.title }}
+                </button>
+            }
+            <button (click)="nav.score()" class="flex justify-center items-center h-22 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
                 text-2xl leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
-                {{ quiz.title }}
+                Scoreboard
             </button>
         }
-        <button (click)="nav.score()" class="flex justify-center items-center h-22 w-108 bg-[#1c1c1c] border-4 border-[#d47108] rounded-full 
-            text-2xl leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
-            Scoreboard
-        </button>
-    }
+    </div>
 </div>

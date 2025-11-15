@@ -21,6 +21,7 @@
 
 // Time Progress Bar
 .time-progress {
+    z-index: 100;
     width: 0;
     height: 8px;
     display: inline-block;
@@ -35,6 +36,7 @@
 
 .time-progress::after,
 .time-progress::before {
+    z-index: 100;
     content: "";
     width: 10px;
     height: 1px;

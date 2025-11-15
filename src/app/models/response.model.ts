@@ -1,4 +1,14 @@
-export class ResponseModel {
+export class ResponseStartModel {
+    player_name: string;
+    question_id: number;
+
+    constructor(data: { player_name: string; question_id: number }) {
+        this.player_name = data.player_name;
+        this.question_id = data.question_id;
+    }
+}
+
+export class ResponseFinishModel {
     player_name: string;
     question_id: number;
     answer_id: number | null;

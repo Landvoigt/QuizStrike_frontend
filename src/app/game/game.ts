@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NgStyle, NgTemplateOutlet } from '@angular/common';
-import { interval, Subscription } from 'rxjs';
+import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { GameService } from '../services/game.service';
 import { RestService } from '../services/rest.service';
 import { NavigationService } from '../services/navigation.service';
@@ -84,8 +84,22 @@ export class GameComponent implements OnInit, OnDestroy {
     this.nextStep();
   }
 
-  nextStep(): void {
+  async nextStep(): Promise<void> {
     if (this.timerSubscription && (this.isFlipping || this.timeRunning)) {
+      return;
+    }
+
+    const nextQuestion = this.questions[this.currentQuestionIndex + 1];
+    if (!nextQuestion) {
+      this.nav.menu();
+      return;
+    }
+
+    try {
+      const response = this.buildStartResponse(nextQuestion);
+      await firstValueFrom(this.rest.startResponse(response));
+    } catch (err) {
+      this.error.handleError(err);
       return;
     }
 
@@ -97,6 +111,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.step++;
     this.flipRotation = `rotateX(${this.step * 180}deg)`;
     this.isQuestionSide = !this.isQuestionSide;
+    this.cdr.detectChanges();
   }
 
   nextQuestion(): void {
@@ -145,9 +160,9 @@ export class GameComponent implements OnInit, OnDestroy {
     const elapsedTime = Date.now() - this.startTime;
     const time = Math.min(elapsedTime, question.time);
 
-    const response = this.buildResponse(answer, question, time);
+    const response = this.buildFinishResponse(answer, question, time);
 
-    this.rest.saveResponse(response).subscribe({
+    this.rest.finishResponse(response).subscribe({
       next: () => { return; },
       error: (err) => this.error.handleError(err),
     });
@@ -219,8 +234,15 @@ export class GameComponent implements OnInit, OnDestroy {
       .sort(() => Math.random() - 0.5) ?? [];
   }
 
-  buildResponse(answer: Interfaces.Answer | null, question: Interfaces.Question, time: number): Models.ResponseModel {
-    return new Models.ResponseModel({
+  buildStartResponse(question: Interfaces.Question): Models.ResponseStartModel {
+    return new Models.ResponseStartModel({
+      player_name: localStorage.getItem('QuizStrike_player') ?? '',
+      question_id: question.id,
+    });
+  }
+
+  buildFinishResponse(answer: Interfaces.Answer | null, question: Interfaces.Question, time: number): Models.ResponseFinishModel {
+    return new Models.ResponseFinishModel({
       player_name: localStorage.getItem('QuizStrike_player') ?? '',
       question_id: question.id,
       answer_id: answer?.id ?? null,

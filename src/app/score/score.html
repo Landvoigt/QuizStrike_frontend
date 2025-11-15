@@ -1,32 +1,33 @@
-<div class="flex flex-col justify-start items-center h-screen w-full gap-4 bg-[#1c1c1c] pl-48 pr-48 pt-10 pb-10">
+<div class="bg-[#2c2c2c] bg-stripes h-full w-full flex">
+    <div class="flex flex-col justify-start items-center h-screen w-full gap-4 pl-48 pr-48 pt-10 pb-10">
+        <div class="absolute top-8 left-8 flex justify-center items-center">
+            <button (click)="nav.menu()"
+                class="flex justify-center items-center h-8 w-20 bg-[#1c1c1c] border-[#d47108] rounded-full 
+                text-md leading-none text-shadow-md/30 hover:text-shadow-md/5 text-white font-bold antialiased pointer pt-0.5">
+                Menu
+            </button>
+        </div>
 
-    <div class="absolute top-8 left-8 flex justify-center items-center">
-        <button (click)="nav.menu()"
-            class="flex justify-center items-center h-8 w-20 bg-[#1c1c1c] border-[#d47108] rounded-full 
-            text-md leading-none text-shadow-md/30 hover:text-shadow-md/5 text-white font-bold antialiased pointer pt-0.5">
-            Menu
-        </button>
-    </div>
+        <h1 class="text-4xl text-white text-shadow-lg/100 font-bold mb-6">Scoreboard</h1>
 
-    <h1 class="text-4xl text-white text-shadow-lg/100 font-bold mb-6">Scoreboard</h1>
-
-    <div class="flex justify-between items-center h-12 w-full bg-[#1c1c1c] 
-        rounded-[16rem] shadow-[inset_0_0_0_3px_#d47108] p-4 text-lg text-white font-bold">
-        <span class="w-1/3 text-start text-shadow-md/50 pt-0.5">Score</span>
-        <span class="w-1/3 text-center text-shadow-md/50 pt-0.5">Spieler</span>
-        <span class="w-1/3 text-end text-shadow-md/50 pt-0.5">Zeit</span>
-    </div>
-    <div class="w-[94%] rounded-[16rem] border-2 border-[#d47108] mt-2 mb-2"></div>
-    <div class="relative flex flex-col h-full w-full gap-4">
-        @for (score of scores; track score.id) {
-            <div [attr.data-id]="score.id" class="score-row flex justify-center items-center h-12 w-full pb-1.5">
-                <div class="flex justify-between items-center h-full w-full bg-[#d47108] border-2 border-[#d47108] 
-                    rounded-[16rem] shadow-[inset_0_0_0_3px_#1c1c1c] p-4 text-lg text-[#1c1c1c] font-bold transition-all duration-500">
-                    <span class="w-1/3 text-start text-shadow-md/10 pt-0.5">{{ score.score }}</span>
-                    <span class="w-1/3 text-center text-shadow-md/10 pt-0.5">{{ score.player.name }}</span>
-                    <span class="w-1/3 text-end text-shadow-md/10 pt-0.5">{{ formatTime(score.time) }}</span>
+        <div class="flex justify-between items-center h-12 w-full bg-[#1c1c1c] 
+            rounded-[16rem] shadow-[inset_0_0_0_3px_#d47108] p-4 text-lg text-white font-bold">
+            <span class="w-1/3 text-start text-shadow-md/50 pt-0.5">Score</span>
+            <span class="w-1/3 text-center text-shadow-md/50 pt-0.5">Spieler</span>
+            <span class="w-1/3 text-end text-shadow-md/50 pt-0.5">Zeit</span>
+        </div>
+        <div class="w-[94%] rounded-[16rem] border-2 border-[#d47108] mt-2 mb-2"></div>
+        <div class="relative flex flex-col h-full w-full gap-4">
+            @for (score of scores; track score.id) {
+                <div [attr.data-id]="score.id" class="score-row flex justify-center items-center h-12 w-full pb-1.5">
+                    <div class="flex justify-between items-center h-full w-full bg-[#d47108] border-2 border-[#d47108] 
+                        rounded-[16rem] shadow-[inset_0_0_0_3px_#1c1c1c] p-4 text-lg text-[#1c1c1c] font-bold transition-all duration-500">
+                        <span class="w-1/3 text-start text-shadow-md/10 pt-0.5">{{ score.score }}</span>
+                        <span class="w-1/3 text-center text-shadow-md/10 pt-0.5">{{ score.player.name }}</span>
+                        <span class="w-1/3 text-end text-shadow-md/10 pt-0.5">{{ formatTime(score.time) }}</span>
+                    </div>
                 </div>
-            </div>
-        }
+            }
+        </div>
     </div>
 </div>

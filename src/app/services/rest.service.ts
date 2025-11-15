@@ -26,8 +26,12 @@ export class RestService {
     return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}player/`, data);
   }
 
-  saveResponse(response: Models.ResponseModel): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}response/`, response);
+  startResponse(response: Models.ResponseStartModel): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}start/`, response);
+  }
+
+  finishResponse(response: Models.ResponseFinishModel): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}finish/`, response);
   }
 
 }
