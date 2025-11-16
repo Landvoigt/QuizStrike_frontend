@@ -1,3 +1,13 @@
+input {
+    transition: all 350ms ease-in-out;
+    box-shadow: 0 0 0 4px #d47108;
+    outline: none;
+
+    &:focus {
+        box-shadow: 0 0 0 4px white;
+    }
+}
+
 button {
     z-index: 1;
     position: relative;
@@ -18,17 +28,29 @@ button::before {
     width: 1em;
     height: 1em;
     border-radius: 50%;
-    background-color: #d47108;
     transform-origin: center;
     transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 0);
     transition: transform 425ms ease-in-out;
 }
 
-button:hover {
+button:not(:disabled)::before {
+    background-color: #d47108;
+}
+
+button:not(:disabled):hover {
     cursor: pointer;
     color: #1c1c1c;
 }
 
-button:hover::before {
+button:not(:disabled):hover::before {
     transform: translate3d(-50%, -50%, 0) scale3d(20, 20, 20);
+}
+
+button:disabled {
+    opacity: 0.6;
+    color: #ffffff;
+}
+
+button:disabled::before {
+    transform: none !important;
 }

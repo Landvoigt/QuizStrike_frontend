@@ -1,6 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgModel } from '@angular/forms';
 import { NavigationService } from '../services/navigation.service';
 import { RestService } from '../services/rest.service';
 import { GameService } from '../services/game.service';
@@ -63,8 +63,8 @@ export class MenuComponent implements OnInit {
     this.showInput = true;
   }
 
-  register(): void {
-    if (!this.playerName.trim()) return;
+  register(nameInput: NgModel): void {
+    if (!nameInput.valid || !this.playerName.trim()) return;
 
     this.rest.getGame({ name: this.playerName.trim(), quizId: this.selectedQuiz?.id ?? null })
       .subscribe({

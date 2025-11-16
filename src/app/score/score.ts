@@ -88,12 +88,14 @@ export class ScoreComponent implements OnInit, OnDestroy {
   }
 
   animateScoreRows(data: Interfaces.Score[]): void {
+    const rowHeight = window.innerWidth < 640 ? 2.375 : 3;
+
     data.forEach((s, i) => {
       const rowEl = document.querySelector(`.score-row[data-id='${s.id}']`) as HTMLElement;
       if (!rowEl) return;
 
       const oldPos = this.previousPositions[s.id];
-      rowEl.style.top = `${i * 3}rem`;
+      rowEl.style.top = `${i * rowHeight}rem`;
       rowEl.classList.remove('goUp', 'goDown');
 
       if (oldPos > i) rowEl.classList.add('goUp');

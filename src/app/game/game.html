@@ -1,22 +1,27 @@
-<div class="bg-[#2c2c2c] bg-stripes h-full w-full flex">
-    <div class="flex flex-col justify-center items-center h-screen w-full gap-4 p-8">
-        <div class="relative w-full h-96 perspective">
+<div class="bg-[#2c2c2c] bg-stripes h-full w-full flex justify-center items-center">
+    <div class="flex flex-col md:justify-center justify-start items-center h-screen w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 md:p-8 sm:p-6 p-4">
+        <div class="relative w-full md:h-96 sm:h-72 h-52 perspective">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
-                        shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] text-white backface-hidden cursor-pointer" (click)="startGame()">
+                        md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
+                        sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
+                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden cursor-pointer" 
+                        (click)="startGame()">
                         <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center">
-                            <span class="text-3xl mb-4">
+                            <span class="md:text-3xl sm:text-2xl text-xl mb-4">
                                 {{ game?.quiz?.title }}
                             </span>
-                            <span class="text-xl">
+                            <span class="md:text-xl sm:text-lg text-md">
                                 {{ game?.remaining_questions?.length }} Fragen
                             </span>
                         </div>
                     </div>
                 } @else {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
-                        shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] text-white backface-hidden" 
+                        md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
+                        sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
+                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden" 
                         (click)="nextStep()" [class.cursor-pointer]="!timerSubscription">
                         @if (!isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="questionContent"></ng-container>
@@ -24,7 +29,9 @@
                     </div>
 
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
-                        shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] text-white rotate-x-180 backface-hidden" 
+                        md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
+                        sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
+                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white rotate-x-180 backface-hidden" 
                         (click)="nextStep()" [class.cursor-pointer]="!timerSubscription">
                         @if (isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="questionContent"></ng-container>
@@ -34,15 +41,17 @@
             </div>
         </div>
 
-        <div class="z-100 flex flex-col justify-center items-start h-2 w-[82%] bg-[#2c2c2c] rounded-[16rem] mt-2 mb-2">
+        <div class="z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 w-[82%] bg-[#2c2c2c] rounded-[16rem] sm:mt-2 sm:mb-2 mt-1 mb-1">
             <span class="time-progress" [class.time-progress-animation]="timeRunning" [class.time-progress-paused]="timePaused"></span>
         </div>
 
-        <div class="z-50 relative w-full h-96 perspective">
+        <div class="z-50 relative w-full md:h-96 sm:h-72 h-52 perspective">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-start bg-[#d47108] border-4 border-[#d47108] 
-                        rounded-[16rem] shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] backface-hidden">
+                        rounded-[16rem] md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                        sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)] 
+                        shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] backface-hidden">
                     </div>
                 } @else {
                     <div class="absolute w-full h-full flex flex-col justify-center items-start rounded-[16rem] backface-hidden">
@@ -72,15 +81,16 @@
                     : 'none'}">
             </div>
 
-            <div class="relative flex flex-col justify-between items-center gap-4 pt-6 pb-6 pl-24 pr-24 text-center h-full w-full">
-                <span class="text-2xl text-shadow-lg/100">
+            <div class="relative flex flex-col justify-between items-center gap-4 
+                md:pt-6 sm:pt-5 pt-4 md:pb-6 sm:pb-5 pb-4 md:pl-24 sm:pl-18 pl-10 md:pr-24 sm:pr-18 pr-10 text-center h-full w-full">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
                     Frage {{ currentQuestionIndex + 1 + (game?.answered_questions?.length ?? 0) }}
                     / {{ questions.length + (game?.answered_questions?.length ?? 0) }}
                 </span>
-                <span class="text-3xl text-shadow-lg/100">
+                <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100">
                     {{ questions[currentQuestionIndex]?.title }}
                 </span>
-                <span class="text-2xl text-shadow-lg/100">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
                     {{ questions[currentQuestionIndex]?.category_title }}
                 </span>
             </div>
@@ -91,55 +101,71 @@
         <div class="relative grid grid-cols-2 grid-rows-2 h-96 w-full gap-4 place-items-center">
 
             <!-- Answer 0 -->
-            <div (click)="answer(0)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
-                rounded-[16rem] rounded-tr-3xl rounded-bl-3xl shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] transition"
+            <div (click)="answer(0)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
+                md:border-4 sm:border-3 border-2 border-[#d47108]
+                rounded-[16rem] rounded-tr-3xl rounded-bl-3xl 
+                md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
-                <span class="text-2xl text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
                     {{ questions[currentQuestionIndex]?.answers?.[0]?.text }}
                 </span>
             </div>
 
             <!-- Answer 1 -->
-            <div (click)="answer(1)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
-                rounded-[16rem] rounded-tl-3xl rounded-br-3xl shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] transition"
+            <div (click)="answer(1)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
+                md:border-4 sm:border-3 border-2 border-[#d47108]
+                rounded-[16rem] rounded-tl-3xl rounded-br-3xl 
+                md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
-                <span class="text-2xl text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
                     {{ questions[currentQuestionIndex]?.answers?.[1]?.text }}
                 </span>
             </div>
 
             <!-- Answer 2 -->
-            <div (click)="answer(2)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
-                rounded-[16rem] rounded-br-3xl rounded-tl-3xl shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] transition"
+            <div (click)="answer(2)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
+                md:border-4 sm:border-3 border-2 border-[#d47108]
+                rounded-[16rem] rounded-br-3xl rounded-tl-3xl 
+                md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
-                <span class="text-2xl text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
                     {{ questions[currentQuestionIndex]?.answers?.[2]?.text }}
                 </span>
             </div>
 
             <!-- Answer 3 -->
-            <div (click)="answer(3)" class="flex justify-center items-center h-full w-full bg-[#d47108] border-4 border-[#d47108]
-                rounded-[16rem] rounded-bl-3xl rounded-tr-3xl shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] transition"
+            <div (click)="answer(3)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
+                md:border-4 sm:border-3 border-2 border-[#d47108]
+                rounded-[16rem] rounded-bl-3xl rounded-tr-3xl 
+                md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
-                <span class="text-2xl text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
                     {{ questions[currentQuestionIndex]?.answers?.[3]?.text }}
                 </span>
             </div>
 
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div class="flex justify-center items-center text-4xl text-white text-shadow-md/100 font-bold">
+                <div class="flex justify-center items-center md:text-4xl sm:text-3xl text-2xl text-white text-shadow-md/100 font-bold">
                     <span class="counter">{{ formattedTime }}</span>
                 </div>
             </div>
