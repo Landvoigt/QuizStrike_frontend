@@ -27,6 +27,7 @@ export class GameComponent implements OnInit, OnDestroy {
   startScreen: boolean = true;
   isQuestionSide: boolean = false;
   isFlipping: boolean = false;
+  isTransitioning: boolean = false;
 
   timerSubscription?: Subscription;
   startTime!: number;
@@ -104,13 +105,18 @@ export class GameComponent implements OnInit, OnDestroy {
     }
 
     this.clearAll();
+
     this.isFlipping = true;
 
     this.nextQuestion();
 
+    await Promise.resolve();
+    this.cdr.detectChanges();
+
     this.step++;
     this.flipRotation = `rotateX(${this.step * 180}deg)`;
     this.isQuestionSide = !this.isQuestionSide;
+
     this.cdr.detectChanges();
   }
 
@@ -120,14 +126,15 @@ export class GameComponent implements OnInit, OnDestroy {
     } else {
       this.nav.menu();
     }
+  }
+
+  onFlipFinished(event: TransitionEvent): void {
+    if (event.propertyName !== 'transform') return;
+    if (!this.isFlipping) return;
 
     this.isFlipping = false;
+    this.startTimer();
     this.cdr.detectChanges();
-
-    setTimeout(() => {
-      this.startTimer();
-      this.cdr.detectChanges();
-    }, 700);
   }
 
   answer(idx: number): void {

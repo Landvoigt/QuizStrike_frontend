@@ -18,9 +18,9 @@
             <button (click)="play()" type="button" class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 
                 bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 
                 hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
-                {{ game.answered_questions.length ? 'Continue' : 'Play' }}
+                {{ game.answered_questions?.length ? 'Continue' : 'Play' }}
             </button>
-        } 
+        }
         @if (!game && !showInput || game?.quiz_completed) {
             @for(quiz of gameService.quizzes$ | async; track quiz.id) {
                 <button (click)="selectQuiz(quiz)" type="button" class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 

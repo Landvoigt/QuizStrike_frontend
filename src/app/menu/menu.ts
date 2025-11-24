@@ -69,7 +69,7 @@ export class MenuComponent implements OnInit {
     this.rest.getGame({ name: this.playerName.trim(), quizId: this.selectedQuiz?.id ?? null })
       .subscribe({
         next: (data) => this.onRegistrationSuccess(data),
-        error: (err) => this.error.handleError(err),
+        error: (err) => this.onRegistrationError(err),
       });
   }
 
@@ -90,6 +90,12 @@ export class MenuComponent implements OnInit {
 
     localStorage.setItem('QuizStrike_player', this.playerName.trim());
     localStorage.setItem('QuizStrike_runningQuizId', this.game?.quiz.id.toString() ?? '');
+  }
+
+  onRegistrationError(err: any): void {
+    this.error.handleError(err);
+    this.playerName = '';
+    this.cdr.detectChanges();
   }
 
 }

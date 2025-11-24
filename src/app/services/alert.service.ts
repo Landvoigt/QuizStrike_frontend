@@ -25,7 +25,7 @@ export class AlertService {
     this.alertSubject.next({ message, type });
     setTimeout(() => {
       this.alertSubject.next(null);
-    }, 5000);
+    }, 4000);
   }
 
   clearAlert() {

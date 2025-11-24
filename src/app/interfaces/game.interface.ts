@@ -6,7 +6,7 @@ export interface Game {
     player_id: number;
     score_id: number;
     quiz_completed: boolean;
-    answered_questions: number[];
-    remaining_questions: Question[];
+    answered_questions: number[] | null;
+    remaining_questions: Question[] | null;
     quiz: Quiz;
 }

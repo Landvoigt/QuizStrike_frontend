@@ -1,7 +1,8 @@
 <div class="bg-[#2c2c2c] bg-stripes h-full w-full flex justify-center items-center">
     <div class="flex flex-col md:justify-center justify-start items-center h-screen w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 md:p-8 sm:p-6 p-4">
         <div class="relative w-full md:h-96 sm:h-72 h-52 perspective">
-            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation">
+            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation"
+                (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
@@ -43,7 +44,8 @@
         </div>
 
         <div class="z-50 relative w-full md:h-96 sm:h-72 h-52 perspective">
-            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation">
+            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation" 
+                (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#d47108] 
                         md:border-4 sm:border-3 border-2 border-[#d47108] 
@@ -90,7 +92,7 @@
                     Frage {{ currentQuestionIndex + 1 + (game?.answered_questions?.length ?? 0) }}
                     / {{ questions.length + (game?.answered_questions?.length ?? 0) }}
                 </span>
-                <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100">
+                <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100 select-none">
                     {{ questions[currentQuestionIndex]?.title }}
                 </span>
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
@@ -114,7 +116,7 @@
                 [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
                     {{ questions[currentQuestionIndex]?.answers?.[0]?.text }}
                 </span>
             </div>
@@ -130,7 +132,7 @@
                 [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
                     {{ questions[currentQuestionIndex]?.answers?.[1]?.text }}
                 </span>
             </div>
@@ -146,7 +148,7 @@
                 [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
                     {{ questions[currentQuestionIndex]?.answers?.[2]?.text }}
                 </span>
             </div>
@@ -162,7 +164,7 @@
                 [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
                     {{ questions[currentQuestionIndex]?.answers?.[3]?.text }}
                 </span>
             </div>
