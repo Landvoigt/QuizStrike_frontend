@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "Quizstrike_frontend": {
+    "quizstrike": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,6 +17,7 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
+            "outputPath": "dist/quizstrike",
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
@@ -74,10 +75,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "Quizstrike_frontend:build:production"
+              "buildTarget": "quizstrike:build:production"
             },
             "development": {
-              "buildTarget": "Quizstrike_frontend:build:development"
+              "buildTarget": "quizstrike:build:development"
             }
           },
           "defaultConfiguration": "development"
