@@ -2,7 +2,7 @@
     <div class="flex flex-col sm:justify-center justify-start items-center h-screen w-full sm:gap-12 gap-6 text-white 
     sm:pt-0 pt-8 sm:pb-0 pb-8 sm:pl-6 sm:pr-6 pl-12 pr-12">
         @if (showInput) {
-            <input [(ngModel)]="playerName" type="text" placeholder="Your name..." minlength="3" #nameInput="ngModel" required
+            <input [(ngModel)]="playerName" type="text" placeholder="Dein Name..." minlength="3" #nameInput="ngModel" required
                 (keydown.enter)="register(nameInput)"
                 class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 
                 bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 
@@ -18,7 +18,7 @@
             <button (click)="play()" type="button" class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 
                 bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 
                 hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
-                {{ game.answered_questions?.length ? 'Continue' : 'Play' }}
+                {{ game.answered_questions ? 'Weiter' : 'Start' }}
             </button>
         }
         @if (!game && !showInput || game?.quiz_completed) {
@@ -29,11 +29,13 @@
                     {{ quiz.title }}
                 </button>
             }
-            <button (click)="nav.score()" type="button" class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 
-                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 
-                hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
-                Scoreboard
-            </button>
+            @if ((gameService.quizzes$ | async)?.length ?? 0 > 0) {
+                <button (click)="nav.score()" type="button" class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 
+                    bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 
+                    hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
+                    Scoreboard
+                </button>
+            }
         }
     </div>
 </div>

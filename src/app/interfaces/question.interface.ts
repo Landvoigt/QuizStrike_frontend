@@ -5,7 +5,7 @@ export interface Question {
     quizId: number;
     title: string;
     description: string;
-    categoryId: number;
+    category: number;
     category_title: string;
     time: number;
     points: number;

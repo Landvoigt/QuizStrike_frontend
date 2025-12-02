@@ -54,7 +54,7 @@
                         shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] backface-hidden">
                         <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center">
                             <span class="md:text-2xl sm:text-xl text-lg">
-                                {{ game?.remaining_questions?.length }} Fragen
+                                {{ currentQuestion?.remaining_questions }} Fragen
                             </span>
                         </div>
                     </div>
@@ -80,23 +80,20 @@
         <div class="relative h-full w-full overflow-hidden rounded-[16rem]">
 
             <div class="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-[16rem] m-3" 
-                [class.opacity-40]="questions[currentQuestionIndex]?.transparent"
-                [ngStyle]="{'background-image': questions[currentQuestionIndex]?.image
-                    ? 'url(http://127.0.0.1:8000/' + questions[currentQuestionIndex].image + ')'
-                    : 'none'}">
+                [class.opacity-30]="currentQuestion?.question?.transparent || !currentQuestion?.question?.image"
+                [style.background-image]="background(currentQuestion)">
             </div>
 
             <div class="relative flex flex-col justify-between items-center gap-4 
                 md:pt-6 sm:pt-5 pt-4 md:pb-6 sm:pb-5 pb-4 md:pl-24 sm:pl-18 pl-10 md:pr-24 sm:pr-18 pr-10 text-center h-full w-full">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
-                    Frage {{ currentQuestionIndex + 1 + (game?.answered_questions?.length ?? 0) }}
-                    / {{ questions.length + (game?.answered_questions?.length ?? 0) }}
+                    Frage {{ (currentQuestion?.answered_questions ?? 0) + 1 }} / {{ currentQuestion?.total_questions }}
                 </span>
                 <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100 select-none">
-                    {{ questions[currentQuestionIndex]?.title }}
+                    {{ this.currentQuestion?.question?.title }}
                 </span>
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
-                    {{ questions[currentQuestionIndex]?.category_title }}
+                    {{ this.currentQuestion?.question?.category_title }}
                 </span>
             </div>
         </div>
@@ -117,7 +114,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
-                    {{ questions[currentQuestionIndex]?.answers?.[0]?.text }}
+                    {{ this.currentQuestion?.question?.answers?.[0]?.text }}
                 </span>
             </div>
 
@@ -133,7 +130,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
-                    {{ questions[currentQuestionIndex]?.answers?.[1]?.text }}
+                    {{ this.currentQuestion?.question?.answers?.[1]?.text }}
                 </span>
             </div>
 
@@ -149,7 +146,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
-                    {{ questions[currentQuestionIndex]?.answers?.[2]?.text }}
+                    {{ this.currentQuestion?.question?.answers?.[2]?.text }}
                 </span>
             </div>
 
@@ -165,7 +162,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
-                    {{ questions[currentQuestionIndex]?.answers?.[3]?.text }}
+                    {{ this.currentQuestion?.question?.answers?.[3]?.text }}
                 </span>
             </div>
 

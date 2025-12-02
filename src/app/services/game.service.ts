@@ -51,7 +51,7 @@ export class GameService {
       next: (game: Interfaces.Game) => {
         this.gameSubject.next(game);
 
-        if (game.quiz_completed || (game.answered_questions?.length ?? 0) > 0) {
+        if (game.quiz_completed || (game.answered_questions ?? 0) > 0) {
           this.nav.game(); 
         } else {
           this.nav.menu();

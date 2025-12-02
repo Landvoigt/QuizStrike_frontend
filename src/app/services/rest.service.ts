@@ -26,11 +26,11 @@ export class RestService {
     return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}player/`, data);
   }
 
-  startResponse(response: Models.ResponseStartModel): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}start/`, response);
+  startQuestion(response: Models.QuestionStartModel): Observable<Interfaces.QuestionStart> {
+    return this.http.post<Interfaces.QuestionStart>(`${this.apiBaseUrl}start/`, response);
   }
 
-  finishResponse(response: Models.ResponseFinishModel): Observable<any> {
+  finishQuestion(response: Models.QuestionFinishModel): Observable<any> {
     return this.http.post(`${this.apiBaseUrl}finish/`, response);
   }
 

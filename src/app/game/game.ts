@@ -1,5 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
-import { NgStyle, NgTemplateOutlet } from '@angular/common';
+import { NgTemplateOutlet } from '@angular/common';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
 import { GameService } from '../services/game.service';
 import { RestService } from '../services/rest.service';
@@ -12,15 +12,14 @@ import * as Models from '../models';
 @Component({
   selector: 'app-game',
   standalone: true,
-  imports: [NgTemplateOutlet, NgStyle],
+  imports: [NgTemplateOutlet],
   templateUrl: './game.html',
   styleUrl: './game.scss',
 })
 export class GameComponent implements OnInit, OnDestroy {
   game: Interfaces.Game | null = null;
 
-  questions: Interfaces.Question[] = [];
-  currentQuestionIndex: number = -1;
+  currentQuestion: Interfaces.QuestionStart | null = null;
 
   step: number = 0;
 
@@ -76,31 +75,38 @@ export class GameComponent implements OnInit, OnDestroy {
     clearTimeout(timeout);
 
     this.game = game;
-    this.questions = this.getQueue();
     this.cdr.detectChanges();
   }
 
-  startGame(): void {
+  async startGame(): Promise<void> {
     this.startScreen = false;
-    this.nextStep();
+    await this.nextStep();
   }
 
   async nextStep(): Promise<void> {
+    if (!this.game) return;
+
     if (this.timerSubscription && (this.isFlipping || this.timeRunning)) {
       return;
     }
 
-    const nextQuestion = this.questions[this.currentQuestionIndex + 1];
-    if (!nextQuestion) {
-      this.nav.menu();
+    const player_name = localStorage.getItem('QuizStrike_player') ?? '';
+    const quiz_id = Number(localStorage.getItem('QuizStrike_runningQuizId'));
+    const payload = new Models.QuestionStartModel({ player_name, quiz_id });
+
+    let response;
+
+    try {
+      response = await firstValueFrom(this.rest.startQuestion(payload));
+    } catch (err) {
+      this.error.handleError(err);
       return;
     }
 
-    try {
-      const response = this.buildStartResponse(nextQuestion);
-      await firstValueFrom(this.rest.startResponse(response));
-    } catch (err) {
-      this.error.handleError(err);
+    if (response.quiz_completed) {
+      this.nav.menu();
+      localStorage.removeItem('QuizStrike_player');
+      localStorage.removeItem('QuizStrike_runningQuizId');
       return;
     }
 
@@ -108,7 +114,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.isFlipping = true;
 
-    this.nextQuestion();
+    this.currentQuestion = response;
 
     await Promise.resolve();
     this.cdr.detectChanges();
@@ -121,11 +127,7 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   nextQuestion(): void {
-    if (this.currentQuestionIndex < this.questions.length - 1) {
-      this.currentQuestionIndex++;
-    } else {
-      this.nav.menu();
-    }
+    // this.currentQuestion = response.question;
   }
 
   onFlipFinished(event: TransitionEvent): void {
@@ -142,10 +144,19 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.stopTimer();
 
-    const question = this.questions[this.currentQuestionIndex];
-    const selectedAnswer = question.answers[idx];
+    if (!this.currentQuestion) {
+      console.warn('No current question available.');
+      return;
+    }
 
-    this.setAnswer(idx, selectedAnswer, question);
+    const answers = this.currentQuestion.question.answers;
+    if (!answers || idx < 0 || idx >= answers.length) {
+      console.warn('Invalid answer index:', idx);
+      return;
+    }
+
+    const selectedAnswer = answers[idx];
+    this.setAnswer(idx, selectedAnswer, this.currentQuestion.question);
   }
 
   setAnswer(idx: number, answer: Interfaces.Answer, question: Interfaces.Question): void {
@@ -153,7 +164,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.correctAnswerIdx = question.answers.findIndex(a => a.correct);
     this.selectedAnswerCorrect = answer.correct;
 
-    this.sendResponse(answer, question);
+    this.sendResponse(answer);
 
     if (!answer.correct) {
       this.showCorrectAnswer = true;
@@ -161,15 +172,19 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
-  sendResponse(answer: Interfaces.Answer | null, question: Interfaces.Question): void {
-    if (!this.game) return;
+  sendResponse(answer: Interfaces.Answer | null): void {
+    if (!this.currentQuestion || !this.game) return;
 
     const elapsedTime = Date.now() - this.startTime;
-    const time = Math.min(elapsedTime, question.time);
+    const time = Math.min(elapsedTime, this.currentQuestion.question.time);
 
-    const response = this.buildFinishResponse(answer, question, time);
+    const response = new Models.QuestionFinishModel({
+      response_id: this.currentQuestion?.response_id ?? 0,
+      answer_id: answer?.id ?? null,
+      time
+    });
 
-    this.rest.finishResponse(response).subscribe({
+    this.rest.finishQuestion(response).subscribe({
       next: () => { return; },
       error: (err) => this.error.handleError(err),
     });
@@ -205,13 +220,13 @@ export class GameComponent implements OnInit, OnDestroy {
     this.stopTimer();
 
     if (this.selectedAnswerIdx == null) {
-      const question = this.questions[this.currentQuestionIndex];
-      this.correctAnswerIdx = question.answers.findIndex(a => a.correct);
+      const correctIdx = this.currentQuestion?.question?.answers.findIndex(a => a.correct) ?? null;
+      this.correctAnswerIdx = correctIdx;
       this.selectedAnswerCorrect = false;
       this.showCorrectAnswer = true;
       this.cdr.detectChanges();
 
-      this.sendResponse(null, question);
+      this.sendResponse(null);
     }
   }
 
@@ -232,30 +247,21 @@ export class GameComponent implements OnInit, OnDestroy {
     return s;
   }
 
-  getQueue(): Interfaces.Question[] {
-    return this.game?.remaining_questions
-      ?.map(q => ({
-        ...q,
-        answers: [...q.answers].sort(() => Math.random() - 0.5)
-      }))
-      .sort(() => Math.random() - 0.5) ?? [];
-  }
+  // buildStartResponse(question: Interfaces.Question): Models.QuestionStartModel {
+  //   return new Models.QuestionStartModel({
+  //     player_name: localStorage.getItem('QuizStrike_player') ?? '',
+  //     question_id: question.id,
+  //   });
+  // }
 
-  buildStartResponse(question: Interfaces.Question): Models.ResponseStartModel {
-    return new Models.ResponseStartModel({
-      player_name: localStorage.getItem('QuizStrike_player') ?? '',
-      question_id: question.id,
-    });
-  }
-
-  buildFinishResponse(answer: Interfaces.Answer | null, question: Interfaces.Question, time: number): Models.ResponseFinishModel {
-    return new Models.ResponseFinishModel({
-      player_name: localStorage.getItem('QuizStrike_player') ?? '',
-      question_id: question.id,
-      answer_id: answer?.id ?? null,
-      time: time
-    });
-  }
+  // buildFinishResponse(answer: Interfaces.Answer | null, question: Interfaces.Question, time: number): Models.QuestionFinishModel {
+  //   return new Models.QuestionFinishModel({
+  //     player_name: localStorage.getItem('QuizStrike_player') ?? '',
+  //     question_id: question.id,
+  //     answer_id: answer?.id ?? null,
+  //     time: time
+  //   });
+  // }
 
   buildFormattedTime(elapsed: number): void {
     const capped = Math.min(elapsed, 10000);
@@ -263,6 +269,23 @@ export class GameComponent implements OnInit, OnDestroy {
     const milliseconds = capped % 1000;
     this.formattedTime = `${this.pad(seconds)}.${this.pad(milliseconds, 3)}`;
     this.cdr.detectChanges();
+  }
+
+  background(question: Interfaces.QuestionStart | null): string {
+    if (!question?.question) return 'none';
+
+    if (question.question.image) {
+      return `url('http://127.0.0.1:8000/${question.question.image}')`;
+    }
+
+    switch (question.question.category) {
+      case 1: return `url('assets/images/basics.webp')`;
+      case 2: return `url('assets/images/maps.avif')`;
+      case 3: return `url('assets/images/esports.jpg')`;
+      case 4: return `url('assets/images/moments.webp')`;
+      case 5: return `url('assets/images/skins.webp')`;
+      default: return 'none';
+    }
   }
 
   ngOnDestroy(): void {
