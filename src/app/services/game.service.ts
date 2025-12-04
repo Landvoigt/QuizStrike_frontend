@@ -5,6 +5,7 @@ import { ErrorService } from './error.service';
 import { NavigationService } from './navigation.service';
 
 import * as Interfaces from '../interfaces';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,12 @@ export class GameService {
   private gameSubject = new BehaviorSubject<Interfaces.Game | null>(null);
   game$: Observable<Interfaces.Game | null> = this.gameSubject.asObservable();
 
-  constructor(private rest: RestService, private error: ErrorService, private nav: NavigationService) {
+  constructor(
+    private rest: RestService,
+    private error: ErrorService,
+    private nav: NavigationService,
+    private storage: StorageService) {
+
     this.initialize();
     this.restoreGame();
   }
@@ -43,16 +49,14 @@ export class GameService {
   }
 
   restoreGame(): void {
-    const playerName = localStorage.getItem('QuizStrike_player');
-    const runningQuizId = localStorage.getItem('QuizStrike_runningQuizId');
-    if (!playerName || !runningQuizId) return;
+    if (!this.getPlayer() || !this.getQuiz()) return;
 
-    this.rest.getGame({ name: playerName, quizId: Number(runningQuizId) }).subscribe({
+    this.rest.getGame({ name: this.getPlayer(), quizId: this.getQuiz() }).subscribe({
       next: (game: Interfaces.Game) => {
         this.gameSubject.next(game);
 
         if (game.quiz_completed || (game.answered_questions ?? 0) > 0) {
-          this.nav.game(); 
+          this.nav.game();
         } else {
           this.nav.menu();
         }
@@ -62,6 +66,14 @@ export class GameService {
         this.nav.menu();
       }
     });
+  }
+
+  getPlayer(): string {
+    return this.storage.getString('QuizStrike_player');
+  }
+
+  getQuiz(): number {
+    return this.storage.getNumber('QuizStrike_runningQuizId');
   }
 
 }

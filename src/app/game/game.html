@@ -1,4 +1,4 @@
-<div class="bg-[#2c2c2c] bg-stripes h-full w-full flex justify-center items-center">
+<div class="h-full w-full flex justify-center items-center" [class.fade-in-root]="fadeIn">
     <div class="flex flex-col md:justify-center justify-start items-center h-screen w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 md:p-8 sm:p-6 p-4">
         <div class="relative w-full md:h-96 sm:h-72 h-52 perspective">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation"
@@ -54,7 +54,7 @@
                         shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] backface-hidden">
                         <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center">
                             <span class="md:text-2xl sm:text-xl text-lg">
-                                {{ currentQuestion?.remaining_questions }} Fragen
+                                {{ getRemainingQuestionsCount() }} Fragen
                             </span>
                         </div>
                     </div>
@@ -75,12 +75,11 @@
         </div>
     </div>
 
-
     <ng-template #questionContent>
         <div class="relative h-full w-full overflow-hidden rounded-[16rem]">
 
             <div class="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-[16rem] m-3" 
-                [class.opacity-30]="currentQuestion?.question?.transparent || !currentQuestion?.question?.image"
+                [class.opacity-30]="currentQuestion?.question?.transparent || currentQuestion?.question?.category?.transparent || !currentQuestion?.question?.image"
                 [style.background-image]="background(currentQuestion)">
             </div>
 
@@ -93,7 +92,7 @@
                     {{ this.currentQuestion?.question?.title }}
                 </span>
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
-                    {{ this.currentQuestion?.question?.category_title }}
+                    {{ this.currentQuestion?.question?.category?.title }}
                 </span>
             </div>
         </div>

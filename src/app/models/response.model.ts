@@ -2,9 +2,9 @@ export class QuestionStartModel {
     player_name: string;
     quiz_id: number;
 
-    constructor(data: { player_name: string; quiz_id: number }) {
-        this.player_name = data.player_name;
-        this.quiz_id = data.quiz_id;
+    constructor(player: string, quiz: number) {
+        this.player_name = player;
+        this.quiz_id = quiz;
     }
 }
 

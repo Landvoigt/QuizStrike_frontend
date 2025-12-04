@@ -1,12 +1,12 @@
 import { Answer } from "./answer.interface";
+import { Category } from "./category.interface";
 
 export interface Question {
     id: number;
     quizId: number;
     title: string;
     description: string;
-    category: number;
-    category_title: string;
+    category: Category;
     time: number;
     points: number;
     image: string;

@@ -10,28 +10,33 @@ import * as Models from '../models';
   providedIn: 'root'
 })
 export class RestService {
+  private readonly baseUrl: string = environment.BASE_URL;
   private readonly apiBaseUrl: string = environment.API_BASE_URL;
 
   constructor(private http: HttpClient) { }
 
+  getBaseUrl(): string {
+    return this.baseUrl;
+  }
+
   getQuizzes(): Observable<Interfaces.Quiz[]> {
-    return this.http.get<Interfaces.Quiz[]>(`${this.apiBaseUrl}quiz/`);
+    return this.http.get<Interfaces.Quiz[]>(`${this.apiBaseUrl}/quiz/`);
   }
 
   getScores(): Observable<Interfaces.Score[]> {
-    return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}score/`);
+    return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}/score/`);
   }
 
   getGame(data: { name: string; quizId: number | null }): Observable<Interfaces.Game> {
-    return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}player/`, data);
+    return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}/player/`, data);
   }
 
   startQuestion(response: Models.QuestionStartModel): Observable<Interfaces.QuestionStart> {
-    return this.http.post<Interfaces.QuestionStart>(`${this.apiBaseUrl}start/`, response);
+    return this.http.post<Interfaces.QuestionStart>(`${this.apiBaseUrl}/start/`, response);
   }
 
   finishQuestion(response: Models.QuestionFinishModel): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}finish/`, response);
+    return this.http.post(`${this.apiBaseUrl}/finish/`, response);
   }
 
 }

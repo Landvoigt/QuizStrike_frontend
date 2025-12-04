@@ -1,10 +1,13 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { NavigationEnd, Router } from '@angular/router';
 import { FormsModule, NgModel } from '@angular/forms';
+
 import { NavigationService } from '../services/navigation.service';
 import { RestService } from '../services/rest.service';
 import { GameService } from '../services/game.service';
 import { ErrorService } from '../services/error.service';
+import { StorageService } from '../services/storage.service';
 
 import * as Interfaces from '../interfaces';
 
@@ -23,24 +26,26 @@ export class MenuComponent implements OnInit {
 
   playerName: string = '';
 
+  fadeIn: boolean = false;
+
   constructor(
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private rest: RestService,
     private error: ErrorService,
     public nav: NavigationService,
-    public gameService: GameService
+    public gameService: GameService,
+    private storage: StorageService
   ) { }
 
   ngOnInit(): void {
     this.tryRestorePlayer();
+    this.fadeInPage();
   }
 
   private tryRestorePlayer(): void {
-    const storedName = localStorage.getItem('QuizStrike_player');
-    const storedQuizId = localStorage.getItem('QuizStrike_runningQuizId');
-
-    if (!storedName || !storedQuizId) return;
-    this.playerName = storedName;
+    if (!this.getPlayer() || !this.getQuiz()) return;
+    this.playerName = this.getPlayer();
     this.selectedQuiz = null;
 
     this.gameService.game$.subscribe((game) => this.onGameLoaded(game));
@@ -79,23 +84,54 @@ export class MenuComponent implements OnInit {
       return;
     }
 
-    setTimeout(() => this.nav.game(), 1000);
+    this.nav.game();
   }
 
   onRegistrationSuccess(game: Interfaces.Game): void {
     this.gameService.setGame(game);
     this.game = game;
+
     this.showInput = false;
+
     this.cdr.detectChanges();
 
-    localStorage.setItem('QuizStrike_player', this.playerName.trim());
-    localStorage.setItem('QuizStrike_runningQuizId', this.game?.quiz.id.toString() ?? '');
+    this.setValues();
   }
 
   onRegistrationError(err: any): void {
     this.error.handleError(err);
     this.playerName = '';
     this.cdr.detectChanges();
+  }
+
+  fadeInPage() {
+    this.triggerFadeIn();
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.triggerFadeIn();
+      }
+    });
+  }
+
+  triggerFadeIn() {
+    this.fadeIn = false;
+    setTimeout(() => {
+      this.fadeIn = true;
+      this.cdr.detectChanges();
+    }, 10);
+  }
+
+  getPlayer(): string {
+    return this.storage.getString('QuizStrike_player');
+  }
+  
+  getQuiz(): number {
+    return this.storage.getNumber('QuizStrike_runningQuizId');
+  }
+  
+  setValues(): void {
+    this.storage.set('QuizStrike_player', this.playerName.trim());
+    this.storage.set('QuizStrike_runningQuizId', this.game?.quiz.id.toString() ?? '');
   }
 
 }

@@ -1,8 +1,10 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { finalize, interval, Subscription } from 'rxjs';
+
 import { RestService } from '../services/rest.service';
 import { ErrorService } from '../services/error.service';
 import { NavigationService } from '../services/navigation.service';
-import { finalize, interval, Subscription } from 'rxjs';
 
 import * as Interfaces from '../interfaces';
 
@@ -20,7 +22,10 @@ export class ScoreComponent implements OnInit, OnDestroy {
 
   previousPositions: Record<string, number> = {};
 
+  fadeIn: boolean = false;
+  
   constructor(
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private rest: RestService,
     private error: ErrorService,
@@ -30,6 +35,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.getScores();
     this.refreshSub = interval(5000).subscribe(() => this.getScores());
+    this.fadeInPage();
   }
 
   getScores(): void {
@@ -117,6 +123,23 @@ export class ScoreComponent implements OnInit, OnDestroy {
   setLoading(value: boolean): void {
     this.loading = value;
     this.cdr.detectChanges();
+  }
+
+  fadeInPage() {
+    this.triggerFadeIn();
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.triggerFadeIn();
+      }
+    });
+  }
+
+  triggerFadeIn() {
+    this.fadeIn = false;
+    setTimeout(() => {
+      this.fadeIn = true;
+      this.cdr.detectChanges();
+    }, 10);
   }
 
   ngOnDestroy(): void {

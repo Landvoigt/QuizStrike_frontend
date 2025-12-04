@@ -1,10 +1,13 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { NavigationEnd, Router } from '@angular/router';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
+
 import { GameService } from '../services/game.service';
 import { RestService } from '../services/rest.service';
 import { NavigationService } from '../services/navigation.service';
 import { ErrorService } from '../services/error.service';
+import { StorageService } from '../services/storage.service';
 
 import * as Interfaces from '../interfaces';
 import * as Models from '../models';
@@ -43,19 +46,20 @@ export class GameComponent implements OnInit, OnDestroy {
 
   flipRotation: string = 'rotateX(0deg)';
 
+  fadeIn: boolean = false;
+
   constructor(
+    private router: Router,
     private cdr: ChangeDetectorRef,
     private rest: RestService,
     private error: ErrorService,
     private nav: NavigationService,
     private gameService: GameService,
+    private storage: StorageService
   ) { }
 
   ngOnInit(): void {
-    const storedName = localStorage.getItem('QuizStrike_player');
-    const storedQuizId = localStorage.getItem('QuizStrike_runningQuizId');
-
-    if (!storedName || !storedQuizId) {
+    if (!this.getPlayer() || !this.getQuiz()) {
       this.nav.menu();
       return;
     }
@@ -67,6 +71,7 @@ export class GameComponent implements OnInit, OnDestroy {
     }, 3000);
 
     this.gameService.game$.subscribe((game) => this.onGameLoaded(game, timeout));
+    this.fadeInPage();
   }
 
   onGameLoaded(game: Interfaces.Game | null, timeout: any): void {
@@ -84,19 +89,12 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   async nextStep(): Promise<void> {
-    if (!this.game) return;
-
-    if (this.timerSubscription && (this.isFlipping || this.timeRunning)) {
-      return;
-    }
-
-    const player_name = localStorage.getItem('QuizStrike_player') ?? '';
-    const quiz_id = Number(localStorage.getItem('QuizStrike_runningQuizId'));
-    const payload = new Models.QuestionStartModel({ player_name, quiz_id });
+    if (!this.game || this.inProgress()) return;
 
     let response;
 
     try {
+      const payload = new Models.QuestionStartModel(this.getPlayer(), this.getQuiz());
       response = await firstValueFrom(this.rest.startQuestion(payload));
     } catch (err) {
       this.error.handleError(err);
@@ -104,9 +102,8 @@ export class GameComponent implements OnInit, OnDestroy {
     }
 
     if (response.quiz_completed) {
+      localStorage.clear();
       this.nav.menu();
-      localStorage.removeItem('QuizStrike_player');
-      localStorage.removeItem('QuizStrike_runningQuizId');
       return;
     }
 
@@ -124,10 +121,6 @@ export class GameComponent implements OnInit, OnDestroy {
     this.isQuestionSide = !this.isQuestionSide;
 
     this.cdr.detectChanges();
-  }
-
-  nextQuestion(): void {
-    // this.currentQuestion = response.question;
   }
 
   onFlipFinished(event: TransitionEvent): void {
@@ -178,11 +171,7 @@ export class GameComponent implements OnInit, OnDestroy {
     const elapsedTime = Date.now() - this.startTime;
     const time = Math.min(elapsedTime, this.currentQuestion.question.time);
 
-    const response = new Models.QuestionFinishModel({
-      response_id: this.currentQuestion?.response_id ?? 0,
-      answer_id: answer?.id ?? null,
-      time
-    });
+    const response = this.buildQuestionFinish(answer, time);
 
     this.rest.finishQuestion(response).subscribe({
       next: () => { return; },
@@ -241,28 +230,6 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  pad(num: number, size: number = 2): string {
-    let s = num.toString();
-    while (s.length < size) s = '0' + s;
-    return s;
-  }
-
-  // buildStartResponse(question: Interfaces.Question): Models.QuestionStartModel {
-  //   return new Models.QuestionStartModel({
-  //     player_name: localStorage.getItem('QuizStrike_player') ?? '',
-  //     question_id: question.id,
-  //   });
-  // }
-
-  // buildFinishResponse(answer: Interfaces.Answer | null, question: Interfaces.Question, time: number): Models.QuestionFinishModel {
-  //   return new Models.QuestionFinishModel({
-  //     player_name: localStorage.getItem('QuizStrike_player') ?? '',
-  //     question_id: question.id,
-  //     answer_id: answer?.id ?? null,
-  //     time: time
-  //   });
-  // }
-
   buildFormattedTime(elapsed: number): void {
     const capped = Math.min(elapsed, 10000);
     const seconds = Math.floor(capped / 1000);
@@ -271,21 +238,62 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  buildQuestionFinish(answer: Interfaces.Answer | null, time: number): Models.QuestionFinishModel {
+    return new Models.QuestionFinishModel({
+      response_id: this.currentQuestion?.response_id ?? 0,
+      answer_id: answer?.id ?? null,
+      time
+    });
+  }
+
+  getPlayer(): string {
+    return this.storage.getString('QuizStrike_player');
+  }
+
+  getQuiz(): number {
+    return this.storage.getNumber('QuizStrike_runningQuizId');
+  }
+
+  getRemainingQuestionsCount(): string {
+    if (!this.game) return '';
+    return String(this.game.total_questions - this.game.answered_questions);
+  }
+
+  pad(num: number, size: number = 2): string {
+    let s = num.toString();
+    while (s.length < size) s = '0' + s;
+    return s;
+  }
+
   background(question: Interfaces.QuestionStart | null): string {
     if (!question?.question) return 'none';
 
     if (question.question.image) {
-      return `url('http://127.0.0.1:8000/${question.question.image}')`;
-    }
+      return `url(${this.rest.getBaseUrl() + question.question.image})`;
+    } else if (question.question.category.image) {
+      return `url(${this.rest.getBaseUrl() + question.question.category.image})`;
+    } else return 'none';
+  }
 
-    switch (question.question.category) {
-      case 1: return `url('assets/images/basics.webp')`;
-      case 2: return `url('assets/images/maps.avif')`;
-      case 3: return `url('assets/images/esports.jpg')`;
-      case 4: return `url('assets/images/moments.webp')`;
-      case 5: return `url('assets/images/skins.webp')`;
-      default: return 'none';
-    }
+  inProgress(): boolean {
+    return !!this.timerSubscription && (this.isFlipping || this.timeRunning);
+  }
+
+  fadeInPage() {
+    this.triggerFadeIn();
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.triggerFadeIn();
+      }
+    });
+  }
+
+  triggerFadeIn() {
+    this.fadeIn = false;
+    setTimeout(() => {
+      this.fadeIn = true;
+      this.cdr.detectChanges();
+    }, 10);
   }
 
   ngOnDestroy(): void {
