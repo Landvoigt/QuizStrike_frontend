@@ -79,7 +79,6 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   async startGame(): Promise<void> {
-    this.startScreen = false;
     await this.nextStep();
   }
 
@@ -91,6 +90,7 @@ export class GameComponent implements OnInit, OnDestroy {
     try {
       const payload = new Models.QuestionStartModel(this.getPlayer(), this.getQuiz());
       response = await firstValueFrom(this.rest.startQuestion(payload));
+      this.startScreen = false;
     } catch (err) {
       this.error.handleError(err);
       return;
@@ -164,6 +164,8 @@ export class GameComponent implements OnInit, OnDestroy {
     if (!this.currentQuestion || !this.game) return;
 
     const elapsedTime = Date.now() - this.startTime;
+    this.buildFormattedTime(elapsedTime);
+
     const time = Math.min(elapsedTime, this.currentQuestion.question.time);
 
     const response = this.buildQuestionFinish(answer, time);

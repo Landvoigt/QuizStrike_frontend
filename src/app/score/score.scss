@@ -73,7 +73,7 @@ button:hover::before {
 .score-row div {
     opacity: 0;
     transform: translateY(1rem) scale(0.95);
-    animation: staggered 325ms ease forwards;
+    animation: staggered 300ms ease forwards;
 }
 
 @keyframes staggered {
