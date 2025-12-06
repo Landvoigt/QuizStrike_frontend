@@ -11,4 +11,5 @@ import { FooterComponent } from "./footer/footer.component";
 })
 export class App {
   protected readonly title = signal('Quizstrike_frontend');
+  
 }

@@ -33,18 +33,18 @@ body::after {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.fade-in-root {
-  animation: fadeInPage 325ms ease-in-out forwards;
-}
+// .fade-in-root {
+//   animation: fadeInPage 325ms ease-in-out forwards;
+// }
 
-@keyframes fadeInPage {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
+// @keyframes fadeInPage {
+//   from {
+//     opacity: 0;
+//   }
+//   to {
+//     opacity: 1;
+//   }
+// }
 
 @font-face {
   font-display: swap;

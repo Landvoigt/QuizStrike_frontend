@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
 
 import { GameService } from '../services/game.service';
@@ -46,10 +45,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
   flipRotation: string = 'rotateX(0deg)';
 
-  fadeIn: boolean = false;
-
   constructor(
-    private router: Router,
     private cdr: ChangeDetectorRef,
     private rest: RestService,
     private error: ErrorService,
@@ -71,7 +67,6 @@ export class GameComponent implements OnInit, OnDestroy {
     }, 3000);
 
     this.gameService.game$.subscribe((game) => this.onGameLoaded(game, timeout));
-    this.fadeInPage();
   }
 
   onGameLoaded(game: Interfaces.Game | null, timeout: any): void {
@@ -277,23 +272,6 @@ export class GameComponent implements OnInit, OnDestroy {
 
   inProgress(): boolean {
     return !!this.timerSubscription && (this.isFlipping || this.timeRunning);
-  }
-
-  fadeInPage() {
-    this.triggerFadeIn();
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.triggerFadeIn();
-      }
-    });
-  }
-
-  triggerFadeIn() {
-    this.fadeIn = false;
-    setTimeout(() => {
-      this.fadeIn = true;
-      this.cdr.detectChanges();
-    }, 10);
   }
 
   ngOnDestroy(): void {

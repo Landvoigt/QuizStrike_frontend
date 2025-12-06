@@ -9,6 +9,8 @@ export const routes: Routes = [
     { path: 'menu', component: MenuComponent },
     { path: 'game', component: GameComponent },
     { path: 'score', component: ScoreComponent },
+    // { path: 'imprint', component: ImprintComponent },
+    // { path: 'privacy', component: PrivacyComponent },
 
     { path: '**', redirectTo: 'menu' },
 ];

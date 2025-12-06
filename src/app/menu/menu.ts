@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
-import { NavigationEnd, Router } from '@angular/router';
 import { FormsModule, NgModel } from '@angular/forms';
 
 import { NavigationService } from '../services/navigation.service';
@@ -26,10 +25,7 @@ export class MenuComponent implements OnInit {
 
   playerName: string = '';
 
-  fadeIn: boolean = false;
-
   constructor(
-    private router: Router,
     private cdr: ChangeDetectorRef,
     private rest: RestService,
     private error: ErrorService,
@@ -40,7 +36,6 @@ export class MenuComponent implements OnInit {
 
   ngOnInit(): void {
     this.tryRestorePlayer();
-    this.fadeInPage();
   }
 
   private tryRestorePlayer(): void {
@@ -102,23 +97,6 @@ export class MenuComponent implements OnInit {
     this.error.handleError(err);
     this.playerName = '';
     this.cdr.detectChanges();
-  }
-
-  fadeInPage() {
-    this.triggerFadeIn();
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        this.triggerFadeIn();
-      }
-    });
-  }
-
-  triggerFadeIn() {
-    this.fadeIn = false;
-    setTimeout(() => {
-      this.fadeIn = true;
-      this.cdr.detectChanges();
-    }, 10);
   }
 
   getPlayer(): string {

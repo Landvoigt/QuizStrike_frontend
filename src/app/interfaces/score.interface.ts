@@ -8,5 +8,5 @@ export interface Score {
     time: number;
     created_at: string;
     updated_at: string;
-    justUpdated: boolean;
+    justUpdated: boolean; move?: 'up' | 'down' | null;
 }

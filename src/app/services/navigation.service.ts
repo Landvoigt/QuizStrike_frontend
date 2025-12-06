@@ -44,6 +44,14 @@ export class NavigationService {
     this.router.navigate(['score']);
   }
 
+  imprint() {
+    this.router.navigate(['imprint']);
+  }
+
+  privacy() {
+    this.router.navigate(['privacy']);
+  }
+
   error(params: any) {
     this.router.navigate(['/error'], params);
   }
