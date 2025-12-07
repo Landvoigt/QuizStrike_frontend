@@ -29,6 +29,7 @@ export class GameComponent implements OnInit, OnDestroy {
   isQuestionSide: boolean = false;
   isFlipping: boolean = false;
   isTransitioning: boolean = false;
+  isStarted: boolean = false;
 
   timerSubscription?: Subscription;
   startTime!: number;
@@ -83,7 +84,9 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   async nextStep(): Promise<void> {
-    if (!this.game || this.inProgress()) return;
+    if (!this.game || this.inProgress() || this.isStarted) return;
+
+    this.isStarted = true;
 
     let response;
 
@@ -93,6 +96,7 @@ export class GameComponent implements OnInit, OnDestroy {
       this.startScreen = false;
     } catch (err) {
       this.error.handleError(err);
+      this.isStarted = false;
       return;
     }
 
@@ -171,7 +175,7 @@ export class GameComponent implements OnInit, OnDestroy {
     const response = this.buildQuestionFinish(answer, time);
 
     this.rest.finishQuestion(response).subscribe({
-      next: () => { return; },
+      next: () => { this.isStarted = false; },
       error: (err) => this.error.handleError(err),
     });
   }
