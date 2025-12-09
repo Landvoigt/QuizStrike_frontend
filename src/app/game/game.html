@@ -1,10 +1,10 @@
 <div class="h-full w-full flex justify-center items-center">
-    <div class="flex flex-col md:justify-center justify-start items-center h-screen w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 md:p-8 sm:p-6 p-4">
-        <div class="relative w-full md:h-96 sm:h-72 h-52 perspective">
+    <div class="flex flex-col justify-center items-center h-screen w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 py-12 md:px-8 sm:px-6 px-4">
+        <div class="relative w-full md:h-96 sm:h-75 h-full perspective">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation"
                 (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
-                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
+                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
                         shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden cursor-pointer" 
@@ -16,7 +16,7 @@
                         </div>
                     </div>
                 } @else {
-                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
+                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
                         shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden" 
@@ -26,7 +26,7 @@
                         }
                     </div>
 
-                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] rounded-[16rem] 
+                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
                         shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white rotate-x-180 backface-hidden" 
@@ -39,17 +39,17 @@
             </div>
         </div>
 
-        <div class="z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 w-[82%] bg-[#2c2c2c] rounded-[16rem] sm:mt-2 sm:mb-2 mt-1 mb-1">
+        <div class="z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 w-[82%] bg-[#2c2c2c] sm:rounded-[16rem] rounded-[4rem] sm:mt-2 sm:mb-2 mt-1 mb-1">
             <span class="time-progress" [class.time-progress-animation]="timeRunning" [class.time-progress-paused]="timePaused"></span>
         </div>
 
-        <div class="z-50 relative w-full md:h-96 sm:h-72 h-52 perspective">
+        <div class="z-50 relative w-full md:h-96 sm:h-75 h-full perspective">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation" 
                 (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#d47108] 
                         md:border-4 sm:border-3 border-2 border-[#d47108] 
-                        rounded-[16rem] md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                        sm:rounded-[16rem] rounded-[4rem] md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)] 
                         shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] backface-hidden">
                         <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center">
@@ -59,13 +59,13 @@
                         </div>
                     </div>
                 } @else {
-                    <div class="absolute w-full h-full flex flex-col justify-center items-start rounded-[16rem] backface-hidden">
+                    <div class="absolute w-full h-full flex flex-col justify-center items-start sm:rounded-[16rem] rounded-[4rem] backface-hidden">
                         @if (!isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="answerContent"></ng-container>
                         }
                     </div>
 
-                    <div class="absolute w-full h-full flex flex-col justify-center items-start rounded-[16rem] rotate-x-180 backface-hidden">
+                    <div class="absolute w-full h-full flex flex-col justify-center items-start sm:rounded-[16rem] rounded-[4rem] rotate-x-180 backface-hidden">
                         @if (isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="answerContent"></ng-container>
                         }
@@ -76,22 +76,22 @@
     </div>
 
     <ng-template #questionContent>
-        <div class="relative h-full w-full overflow-hidden rounded-[16rem]">
+        <div class="relative h-full w-full overflow-hidden sm:rounded-[16rem] rounded-[4rem]">
 
-            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat rounded-[16rem] m-3" 
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat sm:rounded-[16rem] rounded-[3.75rem] sm:m-3 m-2.5" 
                 [class.opacity-30]="currentQuestion?.question?.transparent || currentQuestion?.question?.category?.transparent || !currentQuestion?.question?.image"
                 [style.background-image]="background(currentQuestion)">
             </div>
 
             <div class="relative flex flex-col justify-between items-center gap-4 
-                md:pt-6 sm:pt-5 pt-4 md:pb-6 sm:pb-5 pb-4 md:pl-24 sm:pl-18 pl-10 md:pr-24 sm:pr-18 pr-10 text-center h-full w-full">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
+                md:py-6 sm:py-5 py-3 md:px-24 sm:px-18 px-6 text-center h-full w-full">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100 select-none">
                     Frage {{ (currentQuestion?.answered_questions ?? 0) + 1 }} / {{ currentQuestion?.total_questions }}
                 </span>
                 <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100 select-none">
                     {{ this.currentQuestion?.question?.title }}
                 </span>
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100 select-none">
                     {{ this.currentQuestion?.question?.category?.title }}
                 </span>
             </div>
@@ -104,7 +104,7 @@
             <!-- Answer 0 -->
             <div (click)="answer(0)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
                 md:border-4 sm:border-3 border-2 border-[#d47108]
-                rounded-[16rem] rounded-tr-3xl rounded-bl-3xl 
+                sm:rounded-[16rem] rounded-[4rem] sm:rounded-tr-3xl rounded-tr-2xl sm:rounded-bl-3xl rounded-bl-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
@@ -112,7 +112,7 @@
                 [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ this.currentQuestion?.question?.answers?.[0]?.text }}
                 </span>
             </div>
@@ -120,7 +120,7 @@
             <!-- Answer 1 -->
             <div (click)="answer(1)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
                 md:border-4 sm:border-3 border-2 border-[#d47108]
-                rounded-[16rem] rounded-tl-3xl rounded-br-3xl 
+                sm:rounded-[16rem] rounded-[4rem] sm:rounded-tl-3xl rounded-tl-2xl sm:rounded-br-3xl rounded-br-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
@@ -128,7 +128,7 @@
                 [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ this.currentQuestion?.question?.answers?.[1]?.text }}
                 </span>
             </div>
@@ -136,7 +136,7 @@
             <!-- Answer 2 -->
             <div (click)="answer(2)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
                 md:border-4 sm:border-3 border-2 border-[#d47108]
-                rounded-[16rem] rounded-br-3xl rounded-tl-3xl 
+                sm:rounded-[16rem] rounded-[4rem] sm:rounded-br-3xl rounded-br-2xl sm:rounded-tl-3xl rounded-tl-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
@@ -144,15 +144,15 @@
                 [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
-                    {{ this.currentQuestion?.question?.answers?.[2]?.text }}
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
+                    {{ this.currentQuestion?.question?.answers?.[2]?.text }} des winters für uns
                 </span>
             </div>
 
             <!-- Answer 3 -->
             <div (click)="answer(3)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
                 md:border-4 sm:border-3 border-2 border-[#d47108]
-                rounded-[16rem] rounded-bl-3xl rounded-tr-3xl 
+                sm:rounded-[16rem] rounded-[4rem] sm:rounded-bl-3xl rounded-bl-2xl sm:rounded-tr-3xl rounded-tr-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
@@ -160,13 +160,13 @@
                 [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
                 [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none">
+                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ this.currentQuestion?.question?.answers?.[3]?.text }}
                 </span>
             </div>
 
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div class="flex justify-center items-center md:text-4xl sm:text-3xl text-2xl text-white text-shadow-md/100 font-bold">
+                <div class="flex justify-center items-center md:text-4xl sm:text-3xl text-xl text-white text-shadow-md/100 font-bold">
                     <span class="counter">{{ formattedTime }}</span>
                 </div>
             </div>

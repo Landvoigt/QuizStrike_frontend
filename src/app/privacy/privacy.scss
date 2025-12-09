@@ -1,0 +1,35 @@
+button {
+    z-index: 1;
+    position: relative;
+    color: white;
+    outline: none;
+    border: 3px solid #1c1c1c;
+    background-color: #1c1c1c;
+    overflow: hidden;
+    transition: all 450ms ease-in-out;
+    box-shadow: 0 0 0 2px #d47108;
+}
+
+button::before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background-color: #d47108;
+    transform-origin: center;
+    transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 0);
+    transition: transform 525ms ease-in-out;
+}
+
+button:hover {
+    cursor: pointer;
+    color: #1c1c1c;
+}
+
+button:hover::before {
+    transform: translate3d(-50%, -50%, 0) scale3d(10, 10, 10);
+}

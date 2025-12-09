@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { NavigationService } from '../services/navigation.service';
 
 @Component({
   selector: 'app-footer-component',
@@ -8,4 +9,10 @@ import { Component } from '@angular/core';
 })
 export class FooterComponent {
 
+  constructor(public nav: NavigationService) { }
+
+  privacy(): void {
+    if (this.nav.activePage === 'game') return;
+    this.nav.privacy();
+  }
 }

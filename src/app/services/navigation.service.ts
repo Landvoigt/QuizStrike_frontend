@@ -7,7 +7,7 @@ import { filter } from 'rxjs';
   providedIn: 'root'
 })
 export class NavigationService {
-  activePage: string | null = 'home';
+  activePage: string | null = 'menu';
 
   constructor(private router: Router, private locate: Location) {
     this.setupActivePageListener();
@@ -42,10 +42,6 @@ export class NavigationService {
 
   score() {
     this.router.navigate(['score']);
-  }
-
-  imprint() {
-    this.router.navigate(['imprint']);
   }
 
   privacy() {
