@@ -1,3 +1,7 @@
-<router-outlet></router-outlet>
 <app-alert-box></app-alert-box>
-<app-footer-component></app-footer-component>
+<div class="min-h-screen flex flex-col relative">
+    <div class="flex-grow">
+        <router-outlet></router-outlet>
+    </div>
+    <app-footer-component></app-footer-component>
+</div>
