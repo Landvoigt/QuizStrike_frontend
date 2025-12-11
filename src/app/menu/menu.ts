@@ -85,12 +85,14 @@ export class MenuComponent implements OnInit {
   onRegistrationSuccess(game: Interfaces.Game): void {
     this.gameService.setGame(game);
     this.game = game;
-
     this.showInput = false;
 
-    this.cdr.detectChanges();
-
-    this.setValues();
+    if (this.game.answered_questions === this.game.total_questions) {
+      this.onRegistrationError('Game already finished!')
+    } else {
+      this.cdr.detectChanges();
+      this.setValues();
+    }
   }
 
   onRegistrationError(err: any): void {
@@ -102,11 +104,11 @@ export class MenuComponent implements OnInit {
   getPlayer(): string {
     return this.storage.getString('QuizStrike_player');
   }
-  
+
   getQuiz(): number {
     return this.storage.getNumber('QuizStrike_runningQuizId');
   }
-  
+
   setValues(): void {
     this.storage.set('QuizStrike_player', this.playerName.trim());
     this.storage.set('QuizStrike_runningQuizId', this.game?.quiz.id.toString() ?? '');

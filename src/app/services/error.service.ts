@@ -9,9 +9,17 @@ export class ErrorService {
   constructor(private alert: AlertService) { }
 
   handleError(error: any): void {
-    const errMsg = error?.error?.error ?? error?.error?.detail;
+    let errMsg: string | undefined;
 
-    if (typeof errMsg === 'string') {
+    if (typeof error === 'string') {
+      errMsg = error;
+    } else if (typeof error?.error?.error === 'string') {
+      errMsg = error.error.error;
+    } else if (typeof error?.error?.detail === 'string') {
+      errMsg = error.error.detail;
+    }
+
+    if (errMsg) {
       this.alert.showError(errMsg);
     } else {
       this.alert.showError("Unexpected error occurred. Please try again later");
