@@ -88,11 +88,16 @@
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100 select-none">
                     Frage {{ (currentQuestion?.answered_questions ?? 0) + 1 }} / {{ currentQuestion?.total_questions }}
                 </span>
-                <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100 select-none">
-                    {{ this.currentQuestion?.question?.title }}
-                </span>
+                <div class="flex flex-col items-center justify-center">
+                    <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100 select-none">
+                        {{ currentQuestion?.question?.title }}
+                    </span>
+                    <span class="md:text-xl sm:text-lg text-md text-shadow-lg/100 select-none">
+                        {{ currentQuestion?.question?.description }}
+                    </span>
+                </div>
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100 select-none">
-                    {{ this.currentQuestion?.question?.category?.title }}
+                    {{ currentQuestion?.question?.category?.title }}
                 </span>
             </div>
         </div>
@@ -113,7 +118,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
-                    {{ this.currentQuestion?.question?.answers?.[0]?.text }}
+                    {{ currentQuestion?.question?.answers?.[0]?.text }}
                 </span>
             </div>
 
@@ -129,7 +134,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
-                    {{ this.currentQuestion?.question?.answers?.[1]?.text }}
+                    {{ currentQuestion?.question?.answers?.[1]?.text }}
                 </span>
             </div>
 
@@ -145,7 +150,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
-                    {{ this.currentQuestion?.question?.answers?.[2]?.text }}
+                    {{ currentQuestion?.question?.answers?.[2]?.text }}
                 </span>
             </div>
 
@@ -161,7 +166,7 @@
                 [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
-                    {{ this.currentQuestion?.question?.answers?.[3]?.text }}
+                    {{ currentQuestion?.question?.answers?.[3]?.text }}
                 </span>
             </div>
 
