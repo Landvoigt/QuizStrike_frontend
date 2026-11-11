@@ -5,6 +5,7 @@ export interface Game {
     exists: boolean;
     player_id: number;
     score_id: number;
+    token: string;
     quiz_completed: boolean;
     answered_questions: number;
     total_questions: number;

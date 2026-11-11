@@ -66,7 +66,10 @@ export class MenuComponent implements OnInit {
   register(nameInput: NgModel): void {
     if (!nameInput.valid || !this.playerName.trim()) return;
 
-    this.rest.getGame({ name: this.playerName.trim(), quizId: this.selectedQuiz?.id ?? null })
+    const quizId = this.selectedQuiz?.id ?? null;
+    const token = this.gameService.getToken(quizId);
+
+    this.rest.getGame({ name: this.playerName.trim(), quizId }, token)
       .subscribe({
         next: (data) => this.onRegistrationSuccess(data),
         error: (err) => this.onRegistrationError(err),
@@ -88,7 +91,7 @@ export class MenuComponent implements OnInit {
     this.showInput = false;
 
     if (this.game.answered_questions === this.game.total_questions) {
-      this.onRegistrationError('Game already finished!')
+      this.onRegistrationError(this.error.GAME_FINISHED);
     } else {
       this.cdr.detectChanges();
       this.setValues();
@@ -96,7 +99,11 @@ export class MenuComponent implements OnInit {
   }
 
   onRegistrationError(err: any): void {
-    this.error.handleError(err);
+    if (err?.status === 409) {
+      this.error.handleError(this.error.NAME_TAKEN);
+    } else {
+      this.error.handleError(err);
+    }
     this.playerName = '';
     this.cdr.detectChanges();
   }

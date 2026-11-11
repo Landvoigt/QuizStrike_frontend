@@ -1,7 +1,8 @@
-export interface Response {
-    scoreId: number;
-    questionId: number;
-    answerId: number | null;
+export interface QuestionFinishResult {
+    status: string;
+    correct: boolean;
+    correct_answer_id: number | null;
+    points: number;
     time: number;
-    created_at: string;
+    timed_out: boolean;
 }

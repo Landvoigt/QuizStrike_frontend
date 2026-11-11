@@ -5,6 +5,10 @@ import { AlertService } from './alert.service';
   providedIn: 'root'
 })
 export class ErrorService {
+  readonly UNEXPECTED_ERROR: string = 'Unexpected error occurred. Please try again later';
+  readonly NAME_TAKEN: string = 'This name is already taken. Please choose a different name.';
+  readonly INVALID_TOKEN: string = 'Your session is invalid. Please enter your name again.';
+  readonly GAME_FINISHED: string = 'Game already finished!';
 
   constructor(private alert: AlertService) { }
 
@@ -19,11 +23,7 @@ export class ErrorService {
       errMsg = error.error.detail;
     }
 
-    if (errMsg) {
-      this.alert.showError(errMsg);
-    } else {
-      this.alert.showError("Unexpected error occurred. Please try again later");
-    }
+    this.alert.showError(errMsg ?? this.UNEXPECTED_ERROR);
   }
 
 }

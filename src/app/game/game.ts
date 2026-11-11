@@ -46,6 +46,8 @@ export class GameComponent implements OnInit, OnDestroy {
 
   flipRotation: string = 'rotateX(0deg)';
 
+  DEFAULT_TIME_LIMIT: number = 10000;
+
   constructor(
     private cdr: ChangeDetectorRef,
     private rest: RestService,
@@ -91,17 +93,22 @@ export class GameComponent implements OnInit, OnDestroy {
     let response;
 
     try {
+      // Only fetch the question right before showing it: the server starts measuring here.
       const payload = new Models.QuestionStartModel(this.getPlayer(), this.getQuiz());
-      response = await firstValueFrom(this.rest.startQuestion(payload));
+      response = await firstValueFrom(this.rest.startQuestion(payload, this.gameService.getToken()));
       this.startScreen = false;
-    } catch (err) {
-      this.error.handleError(err);
+    } catch (err: any) {
       this.isStarted = false;
+      if (err?.status === 403) {
+        this.handleInvalidToken();
+      } else {
+        this.error.handleError(err);
+      }
       return;
     }
 
     if (response.quiz_completed) {
-      localStorage.clear();
+      this.gameService.resetSession();
       this.nav.menu();
       return;
     }
@@ -126,15 +133,15 @@ export class GameComponent implements OnInit, OnDestroy {
     if (event.propertyName !== 'transform') return;
     if (!this.isFlipping) return;
 
+    // The question is now visible -> start the timer.
     this.isFlipping = false;
     this.startTimer();
     this.cdr.detectChanges();
   }
 
   answer(idx: number): void {
-    if (this.timePaused) return;
-
-    this.stopTimer();
+    // Answers are only accepted while the timer of the visible question is running.
+    if (!this.timerSubscription || this.timePaused || this.selectedAnswerIdx !== null) return;
 
     if (!this.currentQuestion) {
       console.warn('No current question available.');
@@ -147,46 +154,76 @@ export class GameComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const selectedAnswer = answers[idx];
-    this.setAnswer(idx, selectedAnswer, this.currentQuestion.question);
-  }
+    const elapsed = Date.now() - this.startTime;
+    this.stopTimer();
 
-  setAnswer(idx: number, answer: Interfaces.Answer, question: Interfaces.Question): void {
     this.selectedAnswerIdx = idx;
-    this.correctAnswerIdx = question.answers.findIndex(a => a.correct);
-    this.selectedAnswerCorrect = answer.correct;
+    this.cdr.detectChanges();
 
-    this.sendResponse(answer);
-
-    if (!answer.correct) {
-      this.showCorrectAnswer = true;
-      this.cdr.detectChanges();
-    }
+    this.sendResponse(answers[idx], elapsed);
   }
 
-  sendResponse(answer: Interfaces.Answer | null): void {
+  /** Sends the answer; correct/incorrect is only known from the server's reply. */
+  sendResponse(answer: Interfaces.Answer | null, elapsed: number): void {
     if (!this.currentQuestion || !this.game) return;
 
-    const elapsedTime = Date.now() - this.startTime;
-    this.buildFormattedTime(elapsedTime);
+    const limit = this.timeLimit();
+    const time = answer ? Math.min(Math.max(0, Math.round(elapsed)), limit) : limit;
+    this.buildFormattedTime(time);
 
-    const time = Math.min(elapsedTime, this.currentQuestion.question.time);
+    const payload = this.buildQuestionFinish(answer, time);
 
-    const response = this.buildQuestionFinish(answer, time);
-
-    this.rest.finishQuestion(response).subscribe({
-      next: () => { this.isStarted = false; },
-      error: (err) => this.error.handleError(err),
+    this.rest.finishQuestion(payload, this.gameService.getToken()).subscribe({
+      next: (result) => this.showResult(result),
+      error: (err) => this.onFinishError(err),
     });
+  }
+
+  showResult(result: Interfaces.QuestionFinishResult): void {
+    const answers = this.currentQuestion?.question?.answers ?? [];
+    const correctIdx = answers.findIndex(a => a.id === result.correct_answer_id);
+
+    this.correctAnswerIdx = correctIdx >= 0 ? correctIdx : null;
+    this.selectedAnswerCorrect = result.correct;
+    this.showCorrectAnswer = !result.correct;
+    this.isStarted = false;
+    this.cdr.detectChanges();
+  }
+
+  onFinishError(err: any): void {
+    if (err?.status === 409) {
+      // Already submitted (double click / retry) -> treat as success.
+      this.isStarted = false;
+      this.cdr.detectChanges();
+      return;
+    }
+
+    if (err?.status === 403) {
+      this.isStarted = false;
+      this.handleInvalidToken();
+      return;
+    }
+
+    this.error.handleError(err);
+    this.isStarted = false;
+    this.cdr.detectChanges();
+  }
+
+  handleInvalidToken(): void {
+    this.stopTimer();
+    this.gameService.resetSession({ dropToken: true });
+    this.error.handleError(this.error.INVALID_TOKEN);
+    this.nav.menu();
   }
 
   startTimer(): void {
     this.stopTimer();
 
     this.timeRunning = true;
+    this.timePaused = false;
     this.startTime = Date.now();
 
-    const maxTime = 10000;
+    const maxTime = this.timeLimit();
 
     this.timerSubscription = interval(1).subscribe(() => {
       const elapsed = Date.now() - this.startTime;
@@ -210,13 +247,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.stopTimer();
 
     if (this.selectedAnswerIdx == null) {
-      const correctIdx = this.currentQuestion?.question?.answers.findIndex(a => a.correct) ?? null;
-      this.correctAnswerIdx = correctIdx;
-      this.selectedAnswerCorrect = false;
-      this.showCorrectAnswer = true;
-      this.cdr.detectChanges();
-
-      this.sendResponse(null);
+      this.sendResponse(null, this.timeLimit());
     }
   }
 
@@ -231,8 +262,12 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  timeLimit(): number {
+    return this.currentQuestion?.question?.time || this.DEFAULT_TIME_LIMIT;
+  }
+
   buildFormattedTime(elapsed: number): void {
-    const capped = Math.min(elapsed, 10000);
+    const capped = Math.min(elapsed, this.timeLimit());
     const seconds = Math.floor(capped / 1000);
     const milliseconds = capped % 1000;
     this.formattedTime = `${this.pad(seconds)}.${this.pad(milliseconds, 3)}`;

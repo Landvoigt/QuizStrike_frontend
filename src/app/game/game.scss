@@ -94,10 +94,13 @@
         border-color 255ms ease-in-out;
 }
 
+.highlight-pending {
+    filter: brightness(0.75);
+    transition: filter 150ms ease-in-out;
+}
+
 .highlight-blue {
-    // background-color: #1e90ff;
     background-color: #1e90ff;
-    // animation: blink 1.5s linear infinite alternate 2.5s;
 }
 
 .counter {

@@ -115,7 +115,8 @@
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
-                [class.highlight-red]="selectedAnswerIdx === 0 && !selectedAnswerCorrect"
+                [class.highlight-pending]="selectedAnswerIdx === 0 && selectedAnswerCorrect === null"
+                [class.highlight-red]="selectedAnswerIdx === 0 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ currentQuestion?.question?.answers?.[0]?.text }}
@@ -131,7 +132,8 @@
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
-                [class.highlight-red]="selectedAnswerIdx === 1 && !selectedAnswerCorrect"
+                [class.highlight-pending]="selectedAnswerIdx === 1 && selectedAnswerCorrect === null"
+                [class.highlight-red]="selectedAnswerIdx === 1 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ currentQuestion?.question?.answers?.[1]?.text }}
@@ -147,7 +149,8 @@
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
-                [class.highlight-red]="selectedAnswerIdx === 2 && !selectedAnswerCorrect"
+                [class.highlight-pending]="selectedAnswerIdx === 2 && selectedAnswerCorrect === null"
+                [class.highlight-red]="selectedAnswerIdx === 2 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ currentQuestion?.question?.answers?.[2]?.text }}
@@ -163,7 +166,8 @@
                 shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
-                [class.highlight-red]="selectedAnswerIdx === 3 && !selectedAnswerCorrect"
+                [class.highlight-pending]="selectedAnswerIdx === 3 && selectedAnswerCorrect === null"
+                [class.highlight-red]="selectedAnswerIdx === 3 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
                 <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
                     {{ currentQuestion?.question?.answers?.[3]?.text }}

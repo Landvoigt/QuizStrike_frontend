@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class StorageService {
-  
+
   set(key: string, value: string | number | object): void {
     try {
       if (typeof value === 'object') {

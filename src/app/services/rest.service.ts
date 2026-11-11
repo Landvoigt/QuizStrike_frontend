@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import * as Interfaces from '../interfaces';
@@ -10,6 +10,7 @@ import * as Models from '../models';
   providedIn: 'root'
 })
 export class RestService {
+  private readonly PLAYER_TOKEN_HEADER: string = 'X-Player-Token';
   private readonly baseUrl: string = environment.BASE_URL;
   private readonly apiBaseUrl: string = environment.API_BASE_URL;
 
@@ -27,16 +28,23 @@ export class RestService {
     return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}/score/`);
   }
 
-  getGame(data: { name: string; quizId: number | null }): Observable<Interfaces.Game> {
-    return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}/player/`, data);
+  /** Join a quiz. Pass an existing token (e.g. after reload) so the name is recognised as ours. */
+  getGame(data: { name: string; quizId: number | null }, token?: string | null): Observable<Interfaces.Game> {
+    return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}/player/`, data, { headers: this.tokenHeaders(token) });
   }
 
-  startQuestion(response: Models.QuestionStartModel): Observable<Interfaces.QuestionStart> {
-    return this.http.post<Interfaces.QuestionStart>(`${this.apiBaseUrl}/start/`, response);
+  startQuestion(response: Models.QuestionStartModel, token: string | null): Observable<Interfaces.QuestionStart> {
+    return this.http.post<Interfaces.QuestionStart>(`${this.apiBaseUrl}/start/`, response, { headers: this.tokenHeaders(token) });
   }
 
-  finishQuestion(response: Models.QuestionFinishModel): Observable<any> {
-    return this.http.post(`${this.apiBaseUrl}/finish/`, response);
+  finishQuestion(response: Models.QuestionFinishModel, token: string | null): Observable<Interfaces.QuestionFinishResult> {
+    return this.http.post<Interfaces.QuestionFinishResult>(`${this.apiBaseUrl}/finish/`, response, { headers: this.tokenHeaders(token) });
+  }
+
+  private tokenHeaders(token?: string | null): HttpHeaders {
+    let headers = new HttpHeaders();
+    if (token) headers = headers.set(this.PLAYER_TOKEN_HEADER, token);
+    return headers;
   }
 
 }
