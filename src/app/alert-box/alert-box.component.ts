@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertService } from '../services/alert.service';
 
@@ -8,6 +8,7 @@ import * as Interfaces from '../interfaces';
   selector: 'app-alert-box',
   imports: [CommonModule],
   templateUrl: './alert-box.component.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './alert-box.component.scss',
 })
 export class AlertBoxComponent implements OnInit {

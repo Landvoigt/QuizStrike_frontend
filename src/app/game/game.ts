@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { firstValueFrom, interval, Subscription } from 'rxjs';
 
@@ -16,6 +16,7 @@ import * as Models from '../models';
   standalone: true,
   imports: [NgTemplateOutlet],
   templateUrl: './game.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './game.scss',
 })
 export class GameComponent implements OnInit, OnDestroy {

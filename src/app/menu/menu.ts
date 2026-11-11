@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 import { FormsModule, NgModel } from '@angular/forms';
 
@@ -14,6 +14,7 @@ import * as Interfaces from '../interfaces';
   selector: 'app-menu',
   imports: [FormsModule, AsyncPipe],
   templateUrl: './menu.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './menu.scss',
 })
 export class MenuComponent implements OnInit {

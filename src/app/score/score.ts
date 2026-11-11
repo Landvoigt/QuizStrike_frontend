@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { finalize, interval, Subscription } from 'rxjs';
 
 import { RestService } from '../services/rest.service';
@@ -11,6 +11,7 @@ import * as Interfaces from '../interfaces';
   selector: 'app-score',
   imports: [],
   templateUrl: './score.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './score.scss',
 })
 export class ScoreComponent implements OnInit, OnDestroy {

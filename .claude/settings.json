@@ -1,0 +1,9 @@
+{
+    "permissions": {
+        "deny": [
+            "Read(./environment.prod.ts)",
+            "Read(./config.ts)",
+            "Read(./assets/**)"
+        ]
+    }
+}

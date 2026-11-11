@@ -1,9 +1,10 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-overlay',
   imports: [],
   templateUrl: './overlay.html',
+  changeDetection: ChangeDetectionStrategy.Eager,
   styleUrl: './overlay.scss',
 })
 export class Overlay implements OnInit {

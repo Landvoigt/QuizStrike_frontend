@@ -1,5 +1,5 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, ErrorHandler } from '@angular/core';
-import { provideRouter, Router, withInMemoryScrolling } from '@angular/router';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZonelessChangeDetection, ErrorHandler, provideAppInitializer, inject } from '@angular/core';
+import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import { routes } from './app.routes';
 import * as Sentry from "@sentry/angular";
@@ -19,9 +19,9 @@ export const appConfig: ApplicationConfig = {
         showDialog: false,
       }),
     },
-    {
-      provide: Sentry.TraceService,
-      deps: [Router],
-    },
+    // Instantiate Sentry's TraceService at startup so route changes are traced.
+    provideAppInitializer(() => {
+      inject(Sentry.TraceService);
+    }),
   ]
 };
