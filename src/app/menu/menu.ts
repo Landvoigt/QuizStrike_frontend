@@ -106,10 +106,12 @@ export class MenuComponent implements OnInit {
     }
   }
 
-  /** Shows error (409 = name taken), clears name. */
+  /** Shows error (409 = name taken, 400 = invalid name), clears name. */
   onRegistrationError(err: any): void {
     if (err?.status === 409) {
       this.error.handleError(this.error.NAME_TAKEN);
+    } else if (err?.status === 400) {
+      this.error.handleError(this.error.INVALID_NAME);
     } else {
       this.error.handleError(err);
     }

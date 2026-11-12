@@ -1,9 +1,7 @@
-import { Quiz } from "./quiz.interface";
-
 export interface Category {
     id: number;
     title: string;
-    quizzes: Quiz[];
+    quiz: number[];
     image: string;
     transparent: boolean;
     active: boolean;

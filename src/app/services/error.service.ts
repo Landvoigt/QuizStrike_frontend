@@ -9,6 +9,7 @@ export class ErrorService {
   readonly NAME_TAKEN: string = 'This name is already taken. Please choose a different name.';
   readonly INVALID_TOKEN: string = 'Your session is invalid. Please enter your name again.';
   readonly GAME_FINISHED: string = 'Game already finished!';
+  readonly INVALID_NAME: string = 'Invalid name or quiz. Please try again.';
 
   constructor(private alert: AlertService) { }
 

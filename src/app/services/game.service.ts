@@ -32,11 +32,11 @@ export class GameService {
     this.getQuizzes();
   }
 
-  /** Fetches quizzes into `quizzes$`. */
+  /** Fetches quizzes with questions into `quizzes$`. */
   private getQuizzes(): void {
     this.rest.getQuizzes().subscribe({
       next: (data) => {
-        this.quizzesSubject.next(data);
+        this.quizzesSubject.next(data.filter(quiz => quiz.question_count > 0));
       },
       error: (err) => this.error.handleError(err)
     });

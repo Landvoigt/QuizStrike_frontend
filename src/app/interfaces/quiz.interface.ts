@@ -1,10 +1,8 @@
-import { Question } from "./question.interface";
-
 export interface Quiz {
     id: number;
     title: string;
     description: string;
-    questions: Question[];
+    question_count: number;
     active: boolean;
     created_at: string;
     updated_at: string;

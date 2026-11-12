@@ -2,12 +2,12 @@
     <div class="flex flex-col sm:justify-center justify-start items-center h-screen w-full sm:gap-12 gap-6 text-white 
         sm:py-0 py-8 sm:px-6 px-12">
         @if (showInput) {
-            <input [(ngModel)]="playerName" type="text" placeholder="Dein Name..." minlength="3" maxlength="25" #nameInput="ngModel" 
+            <input [(ngModel)]="playerName" type="text" placeholder="Dein Name..." minlength="3" maxlength="40" #nameInput="ngModel" 
                 required (keydown.enter)="register(nameInput)"
                 class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full 
                 bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 
                 text-white font-bold antialiased pointer pt-0.5 text-center" />
-            <button (click)="register(nameInput)" type="button" [disabled]="nameInput.invalid" 
+            <button (click)="register(nameInput)" type="button" [disabled]="nameInput.invalid || !playerName.trim()" 
                 class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full bg-[#1c1c1c] rounded-full 
                 md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold 
                 antialiased pointer pt-0.5 hover:pt-1 disabled:pt-0.5">

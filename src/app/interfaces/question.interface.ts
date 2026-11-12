@@ -3,7 +3,7 @@ import { Category } from "./category.interface";
 
 export interface Question {
     id: number;
-    quizId: number;
+    quiz: number[];
     title: string;
     description: string;
     category: Category;
