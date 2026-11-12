@@ -26,9 +26,9 @@ export class RestService {
     return this.http.get<Interfaces.Quiz[]>(`${this.apiBaseUrl}/quiz/`);
   }
 
-  /** GET scores. */
-  getScores(): Observable<Interfaces.Score[]> {
-    return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}/score/`);
+  /** GET scores of quiz. */
+  getScores(quizId: number): Observable<Interfaces.Score[]> {
+    return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}/score/`, { params: { quiz: quizId } });
   }
 
   /** POST `/player/`: joins quiz; existing token keeps name ours. */

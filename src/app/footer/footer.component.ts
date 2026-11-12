@@ -14,7 +14,7 @@ export class FooterComponent {
 
   /** Opens privacy page, not during game. */
   privacy(): void {
-    if (this.nav.activePage === 'game') return;
+    if (this.nav.isPlaying()) return;
     this.nav.privacy();
   }
 }

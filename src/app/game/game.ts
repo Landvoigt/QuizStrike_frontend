@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { firstValueFrom } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
+import { firstValueFrom, Subscription } from 'rxjs';
 
 import { GameService } from '../services/game.service';
 import { RestService } from '../services/rest.service';
 import { NavigationService } from '../services/navigation.service';
 import { ErrorService } from '../services/error.service';
-import { StorageService } from '../services/storage.service';
 
 import * as Interfaces from '../interfaces';
 import * as Models from '../models';
@@ -20,7 +20,9 @@ import * as Models from '../models';
   styleUrl: './game.scss',
 })
 export class GameComponent implements OnInit, OnDestroy {
+  quizId: number = 0;
   game: Interfaces.Game | null = null;
+  private gamesSub?: Subscription;
 
   currentQuestion: Interfaces.QuestionStart | null = null;
 
@@ -60,30 +62,36 @@ export class GameComponent implements OnInit, OnDestroy {
     private error: ErrorService,
     private nav: NavigationService,
     private gameService: GameService,
-    private storage: StorageService
+    private route: ActivatedRoute
   ) { }
 
-  /** Waits for game data; back to menu if none after 3 s. */
+  /** Loads game of route quiz; back to quiz page if no player. */
   ngOnInit(): void {
-    if (!this.getPlayer() || !this.getQuiz()) {
-      this.nav.menu();
+    this.quizId = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (!this.getPlayer()) {
+      this.finishQuiz();
       return;
     }
 
-    const timeout = setTimeout(() => {
-      if (!this.gameService.getGame()) {
-        this.nav.menu();
-      }
-    }, 3000);
+    this.gameService.setRunningQuiz(this.quizId);
+    this.gamesSub = this.gameService.games$.subscribe((games) => this.onGameLoaded(games[this.quizId] ?? null));
 
-    this.gameService.game$.subscribe((game) => this.onGameLoaded(game, timeout));
+    if (!this.gameService.getGame(this.quizId)) {
+      this.gameService.restore(this.quizId).subscribe((game) => {
+        if (!game) this.finishQuiz();
+      });
+    }
   }
 
-  /** Stores loaded game, cancels menu fallback. */
-  onGameLoaded(game: Interfaces.Game | null, timeout: any): void {
+  /** Stores loaded game; leaves if already completed. */
+  onGameLoaded(game: Interfaces.Game | null): void {
     if (!game) return;
 
-    clearTimeout(timeout);
+    if (this.gameService.isCompleted(game)) {
+      this.finishQuiz();
+      return;
+    }
 
     this.game = game;
     this.cdr.detectChanges();
@@ -115,7 +123,7 @@ export class GameComponent implements OnInit, OnDestroy {
   async fetchQuestion(): Promise<Interfaces.QuestionStart | null> {
     try {
       const payload = new Models.QuestionStartModel(this.getPlayer(), this.getQuiz());
-      const response = await firstValueFrom(this.rest.startQuestion(payload, this.gameService.getToken()));
+      const response = await firstValueFrom(this.rest.startQuestion(payload, this.gameService.getToken(this.quizId)));
       this.startScreen = false;
       return response;
     } catch (err: any) {
@@ -129,10 +137,10 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Ends session, back to menu. */
+  /** Clears running quiz, back to quiz page. */
   finishQuiz(): void {
-    this.gameService.resetSession();
-    this.nav.menu();
+    this.gameService.clearRunningQuiz();
+    this.nav.quiz(this.quizId);
   }
 
   /** Preloads image, resets state, flips to question. */
@@ -205,7 +213,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
     const payload = this.buildQuestionFinish(answer, time);
 
-    this.rest.finishQuestion(payload, this.gameService.getToken()).subscribe({
+    this.rest.finishQuestion(payload, this.gameService.getToken(this.quizId)).subscribe({
       next: (result) => this.showResult(result),
       error: (err) => this.onFinishError(err),
     });
@@ -251,12 +259,12 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  /** Drops session + token, back to name input. */
+  /** Drops player + token, back to name input. */
   handleInvalidToken(): void {
     this.stopTimer();
-    this.gameService.resetSession({ dropToken: true });
+    this.gameService.leave(this.quizId, { dropToken: true });
     this.error.handleError(this.error.INVALID_TOKEN);
-    this.nav.menu();
+    this.finishQuiz();
   }
 
   /** Starts display loop + timeout deadline. */
@@ -366,14 +374,14 @@ export class GameComponent implements OnInit, OnDestroy {
     });
   }
 
-  /** Stored player name. */
+  /** Stored player name for this quiz. */
   getPlayer(): string {
-    return this.storage.getString('QuizStrike_player');
+    return this.gameService.getPlayer(this.quizId);
   }
 
-  /** Stored running quiz id. */
+  /** Quiz id from route. */
   getQuiz(): number {
-    return this.storage.getNumber('QuizStrike_runningQuizId');
+    return this.quizId;
   }
 
   /** Open questions as text for start screen. */
@@ -406,9 +414,10 @@ export class GameComponent implements OnInit, OnDestroy {
     return this.timerActive && (this.isFlipping || this.timeRunning);
   }
 
-  /** Stops timer on leave. */
+  /** Stops timer + game listener on leave. */
   ngOnDestroy(): void {
     this.stopTimer();
+    this.gamesSub?.unsubscribe();
   }
 
 }

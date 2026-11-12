@@ -1,0 +1,60 @@
+<div class="h-full w-full flex">
+    <div class="absolute sm:top-8 sm:left-8 top-4 left-4 flex justify-center items-center">
+        <button (click)="nav.menu()"
+            class="back flex justify-center items-center sm:h-8 h-7 sm:w-20 w-16 bg-[#1c1c1c] sm:border-2 border border-[#d47108] rounded-full
+            sm:text-md text-sm leading-none text-shadow-md/30 hover:text-shadow-md/5 text-white font-bold antialiased pointer pt-0.5">
+            Menu
+        </button>
+    </div>
+
+    <div class="flex flex-col sm:justify-center justify-start items-center min-h-screen w-full sm:gap-12 gap-6 text-white
+        sm:py-0 py-16 sm:px-6 px-12">
+        <div class="flex flex-col items-center gap-2 text-center">
+            <h1 class="sm:text-5xl text-3xl font-bold text-shadow-lg/100">{{ quiz?.title }}</h1>
+            @if (quiz?.description) {
+                <p class="sm:text-xl text-lg text-shadow-md/50">{{ quiz?.description }}</p>
+            }
+            @if (quiz) {
+                <span class="sm:text-lg text-md text-[#d47108] font-bold text-shadow-md/50">{{ quiz.question_count }} Fragen</span>
+            }
+        </div>
+
+        @if (!player) {
+            <input [(ngModel)]="playerName" type="text" placeholder="Dein Name..." minlength="3" maxlength="25" #nameInput="ngModel"
+                required (keydown.enter)="register(nameInput)"
+                class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
+                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50
+                text-white font-bold antialiased pointer pt-0.5 text-center" />
+            <button (click)="register(nameInput)" type="button" [disabled]="nameInput.invalid || !playerName.trim() || joining"
+                class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full bg-[#1c1c1c] rounded-full
+                md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold
+                antialiased pointer pt-0.5 hover:pt-1 disabled:pt-0.5">
+                Starten
+            </button>
+        } @else {
+            <div class="flex flex-col items-center gap-3 md:w-108 sm:w-100 w-full">
+                <input [value]="player" type="text" [disabled]="true"
+                    class="flex justify-center items-center md:h-22 sm:h-19 h-16 w-full
+                    bg-[#d47108] border-6 border-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none
+                    text-[#1c1c1c] font-bold antialiased pointer pt-0.5 text-center" />
+                <button (click)="newPlayer()" type="button"
+                    class="text-sm text-white/60 hover:text-[#d47108] underline underline-offset-4 cursor-pointer transition-colors">
+                    Nicht {{ player }}?
+                </button>
+            </div>
+            <button (click)="play()" type="button" [disabled]="gameService.isCompleted(game)"
+                class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
+                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50
+                hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1 disabled:pt-0.5">
+                {{ gameService.isCompleted(game) ? 'Abgeschlossen' : 'Quiz starten' }}
+            </button>
+        }
+
+        <button (click)="nav.score(quizId)" type="button"
+            class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
+            bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50
+            hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
+            Scoreboard
+        </button>
+    </div>
+</div>

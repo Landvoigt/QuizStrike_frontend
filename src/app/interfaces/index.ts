@@ -2,7 +2,6 @@ export * from "./alert.interface";
 export * from "./answer.interface";
 export * from "./category.interface";
 export * from "./game.interface";
-export * from "./player.interface";
 export * from "./question.interface";
 export * from "./quiz.interface";
 export * from "./response.interface";

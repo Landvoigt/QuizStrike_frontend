@@ -2,14 +2,19 @@
     <div class="flex flex-col justify-start items-center w-full max-w-7xl sm:gap-4 gap-2
         lg:px-48 md:px-24 sm:px-12 px-6 sm:py-10 py-5">
         <div class="absolute sm:top-8 sm:left-8 top-4 left-4 flex justify-center items-center">
-            <button (click)="nav.menu()"
-                class="flex justify-center items-center sm:h-8 h-7 sm:w-20 w-16 bg-[#1c1c1c] sm:border-2 border border-[#d47108] rounded-full 
+            <button (click)="nav.quiz(quizId)"
+                class="flex justify-center items-center sm:h-8 h-7 sm:w-20 w-16 bg-[#1c1c1c] sm:border-2 border border-[#d47108] rounded-full
                 sm:text-md text-sm leading-none text-shadow-md/30 hover:text-shadow-md/5 text-white font-bold antialiased pointer pt-0.5">
-                Menu
+                Zurück
             </button>
         </div>
 
-        <h1 class="sm:text-4xl text-2xl text-white text-shadow-lg/100 font-bold sm:mb-6 mb-3">Scoreboard</h1>
+        <div class="flex flex-col items-center gap-1 sm:mb-6 mb-3">
+            <h1 class="sm:text-4xl text-2xl text-white text-shadow-lg/100 font-bold">Scoreboard</h1>
+            @if (quiz) {
+                <span class="sm:text-lg text-md text-[#d47108] font-bold text-shadow-md/50">{{ quiz.title }}</span>
+            }
+        </div>
 
         <div class="flex justify-between items-center sm:h-12 h-8 w-full bg-[#1c1c1c] 
             rounded-[16rem] sm:shadow-[inset_0_0_0_3px_#d47108] shadow-[inset_0_0_0_2px_#d47108] p-4 sm:text-lg text-md text-white font-bold">

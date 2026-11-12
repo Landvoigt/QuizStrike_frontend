@@ -1,9 +1,11 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { finalize, interval, Subscription } from 'rxjs';
 
 import { RestService } from '../services/rest.service';
 import { ErrorService } from '../services/error.service';
 import { NavigationService } from '../services/navigation.service';
+import { GameService } from '../services/game.service';
 
 import * as Interfaces from '../interfaces';
 
@@ -22,15 +24,27 @@ export class ScoreComponent implements OnInit, OnDestroy {
 
   previousPositions: Record<string, number> = {};
 
+  quizId: number = 0;
+  quiz: Interfaces.Quiz | null = null;
+  private quizSub?: Subscription;
+
   constructor(
     private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute,
     private rest: RestService,
     private error: ErrorService,
+    private gameService: GameService,
     public nav: NavigationService
   ) { }
 
-  /** Loads scores, refreshes every 5 s. */
+  /** Loads quiz + its scores, refreshes every 5 s. */
   ngOnInit(): void {
+    this.quizId = Number(this.route.snapshot.paramMap.get('id'));
+    this.quizSub = this.gameService.quiz$(this.quizId).subscribe((quiz) => {
+      this.quiz = quiz;
+      this.cdr.detectChanges();
+    });
+
     this.getScores();
     this.refreshSub = interval(5000).subscribe(() => this.getScores());
   }
@@ -39,7 +53,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
   getScores(): void {
     this.setLoading(true);
 
-    this.rest.getScores()
+    this.rest.getScores(this.quizId)
       .pipe(finalize(() => this.setLoading(false)))
       .subscribe({
         next: (data) => this.onScoresLoaded(data),
@@ -47,23 +61,11 @@ export class ScoreComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Sorts, updates and animates loaded scores. */
+  /** Updates and animates loaded scores (sorted by backend). */
   onScoresLoaded(data: Interfaces.Score[]): void {
-    const sortedData = this.sortScores(data);
-
-    this.initializePreviousPositions(sortedData);
-    this.updateScores(sortedData);
-    this.animateScoreRows(sortedData);
-  }
-
-  /** Sorted copy: highest score first, then fastest time. */
-  sortScores(data: Interfaces.Score[]): Interfaces.Score[] {
-    return [...data].sort((a, b) => {
-      if (b.score !== a.score) {
-        return b.score - a.score;
-      }
-      return a.time - b.time;
-    });
+    this.initializePreviousPositions(data);
+    this.updateScores(data);
+    this.animateScoreRows(data);
   }
 
   /** Stores initial row positions on first load. */
@@ -129,9 +131,10 @@ export class ScoreComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  /** Stops auto-refresh. */
+  /** Stops auto-refresh + quiz listener. */
   ngOnDestroy(): void {
     this.refreshSub?.unsubscribe();
+    this.quizSub?.unsubscribe();
   }
 
 }

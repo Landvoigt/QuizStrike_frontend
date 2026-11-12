@@ -36,19 +36,29 @@ export class NavigationService {
     this.locate.back();
   }
 
-  /** Opens menu. */
+  /** True while on a game page. */
+  isPlaying(): boolean {
+    return this.router.url.endsWith('/play');
+  }
+
+  /** Opens quiz overview. */
   menu() {
-    this.router.navigate(['menu']);
+    this.router.navigate(['']);
   }
 
-  /** Opens game. */
-  game() {
-    this.router.navigate(['game']);
+  /** Opens quiz page. */
+  quiz(quizId: number) {
+    this.router.navigate(['quiz', quizId]);
   }
 
-  /** Opens scoreboard. */
-  score() {
-    this.router.navigate(['score']);
+  /** Opens game of quiz. */
+  game(quizId: number) {
+    this.router.navigate(['quiz', quizId, 'play']);
+  }
+
+  /** Opens scoreboard of quiz. */
+  score(quizId: number) {
+    this.router.navigate(['quiz', quizId, 'score']);
   }
 
   /** Opens privacy page. */

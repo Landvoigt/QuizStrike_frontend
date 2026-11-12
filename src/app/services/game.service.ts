@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Router, UrlTree } from '@angular/router';
+import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { RestService } from './rest.service';
 import { ErrorService } from './error.service';
-import { NavigationService } from './navigation.service';
 import { StorageService } from './storage.service';
 
 import * as Interfaces from '../interfaces';
@@ -14,21 +14,16 @@ export class GameService {
   private quizzesSubject = new BehaviorSubject<Interfaces.Quiz[]>([]);
   quizzes$: Observable<Interfaces.Quiz[]> = this.quizzesSubject.asObservable();
 
-  private gameSubject = new BehaviorSubject<Interfaces.Game | null>(null);
-  game$: Observable<Interfaces.Game | null> = this.gameSubject.asObservable();
+  private gamesSubject = new BehaviorSubject<Record<number, Interfaces.Game>>({});
+  games$: Observable<Record<number, Interfaces.Game>> = this.gamesSubject.asObservable();
 
   constructor(
     private rest: RestService,
     private error: ErrorService,
-    private nav: NavigationService,
-    private storage: StorageService) {
+    private storage: StorageService,
+    private router: Router) {
 
-    this.initialize();
-    this.restoreGame();
-  }
-
-  /** Loads initial data. */
-  initialize(): void {
+    this.migrateLegacySession();
     this.getQuizzes();
   }
 
@@ -42,83 +37,132 @@ export class GameService {
     });
   }
 
-  /** Stores game + its token, emits on `game$`. */
-  setGame(game: Interfaces.Game): void {
-    this.setToken(game.quiz?.id, game.token);
-    this.gameSubject.next(game);
+  /** Quiz by id from loaded list. */
+  quiz$(quizId: number): Observable<Interfaces.Quiz | null> {
+    return this.quizzes$.pipe(map(quizzes => quizzes.find(quiz => quiz.id === quizId) ?? null));
   }
 
-  /** Current game, if any. */
-  getGame(): Interfaces.Game | null {
-    return this.gameSubject.getValue();
+  /** Joins quiz (+ stored token), stores player + game. */
+  join(quizId: number, name: string): Observable<Interfaces.Game> {
+    return this.rest.getGame({ name, quizId }, this.getToken(quizId))
+      .pipe(tap(game => this.setGame(quizId, name, game)));
   }
 
-  /** Rejoins stored game after reload; 409/404 reset session. */
-  restoreGame(): void {
-    const quizId = this.getQuiz();
-    if (!this.getPlayer() || !quizId) return;
+  /** Rejoins stored player; null if none or failed (409/404 forget player). */
+  restore(quizId: number): Observable<Interfaces.Game | null> {
+    const name = this.getPlayer(quizId);
+    if (!name) return of(null);
 
-    this.rest.getGame({ name: this.getPlayer(), quizId }, this.getToken()).subscribe({
-      next: (game: Interfaces.Game) => {
-        this.setGame(game);
-
-        if (game.quiz_completed || (game.answered_questions ?? 0) > 0) {
-          this.nav.game();
-        } else {
-          this.nav.menu();
-        }
-      },
-      error: (err) => {
-        if (err?.status === 409) {
-          this.resetSession({ dropToken: true });
-          this.error.handleError(this.error.NAME_TAKEN);
-        } else if (err?.status === 404) {
-          this.resetSession();
-          this.error.handleError(err);
-        } else {
-          this.error.handleError(err);
-        }
-        this.nav.menu();
-      }
-    });
+    return this.join(quizId, name).pipe(
+      catchError((err) => {
+        this.onRestoreError(quizId, err);
+        return of(null);
+      })
+    );
   }
 
-  /** Forgets running game; keeps token unless `dropToken`. */
-  resetSession(options: { dropToken?: boolean } = {}): void {
-    if (options.dropToken) {
-      this.removeToken(this.getQuiz());
+  /** Restore error: 409 = name taken, 404 = player gone. */
+  private onRestoreError(quizId: number, err: any): void {
+    if (err?.status === 409) {
+      this.leave(quizId, { dropToken: true });
+      this.error.handleError(this.error.NAME_TAKEN);
+    } else if (err?.status === 404) {
+      this.leave(quizId);
+      this.error.handleError(err);
+    } else {
+      this.error.handleError(err);
     }
-    this.storage.remove('QuizStrike_player');
-    this.storage.remove('QuizStrike_runningQuizId');
-    this.gameSubject.next(null);
   }
 
-  /** Stored player name. */
-  getPlayer(): string {
-    return this.storage.getString('QuizStrike_player');
+  /** Stores token, player name and game for quiz. */
+  private setGame(quizId: number, name: string, game: Interfaces.Game): void {
+    this.setToken(quizId, game.token);
+    this.setPlayer(quizId, name);
+    this.gamesSubject.next({ ...this.gamesSubject.getValue(), [quizId]: game });
   }
 
-  /** Stored running quiz id. */
-  getQuiz(): number {
+  /** Loaded game for quiz, if any. */
+  getGame(quizId: number): Interfaces.Game | null {
+    return this.gamesSubject.getValue()[quizId] ?? null;
+  }
+
+  /** True if all questions answered. */
+  isCompleted(game: Interfaces.Game | null | undefined): boolean {
+    return !!game && (game.quiz_completed || game.answered_questions >= game.total_questions);
+  }
+
+  /** Id of started, unfinished quiz; 0 if none. */
+  getRunningQuiz(): number {
     return this.storage.getNumber('QuizStrike_runningQuizId');
   }
 
-  /** Player token for quiz (default: running quiz). */
-  getToken(quizId: number | null | undefined = this.getQuiz()): string | null {
+  /** Marks quiz as running. */
+  setRunningQuiz(quizId: number): void {
+    this.storage.set('QuizStrike_runningQuizId', quizId.toString());
+  }
+
+  /** Clears running quiz. */
+  clearRunningQuiz(): void {
+    this.storage.remove('QuizStrike_runningQuizId');
+  }
+
+  /** Route guard: redirects to running game, else allows. */
+  runningGameRedirect(): true | UrlTree {
+    const quizId = this.getRunningQuiz();
+    return quizId ? this.router.createUrlTree(['quiz', quizId, 'play']) : true;
+  }
+
+  /** Forgets player + game for quiz; keeps token unless `dropToken`. */
+  leave(quizId: number, options: { dropToken?: boolean } = {}): void {
+    if (options.dropToken) this.removeToken(quizId);
+    if (this.getRunningQuiz() === quizId) this.clearRunningQuiz();
+    this.storage.remove(this.playerKey(quizId));
+
+    const games = { ...this.gamesSubject.getValue() };
+    delete games[quizId];
+    this.gamesSubject.next(games);
+  }
+
+  /** Stored player name for quiz. */
+  getPlayer(quizId: number): string {
+    return this.storage.getString(this.playerKey(quizId));
+  }
+
+  /** Saves player name for quiz. */
+  private setPlayer(quizId: number, name: string): void {
+    this.storage.set(this.playerKey(quizId), name);
+  }
+
+  /** Player token for quiz. */
+  getToken(quizId: number | null | undefined): string | null {
     if (!quizId) return null;
     return this.storage.getString(this.tokenKey(quizId)) || null;
   }
 
   /** Saves player token for quiz. */
-  setToken(quizId: number | null | undefined, token: string | null | undefined): void {
-    if (!quizId || !token) return;
+  private setToken(quizId: number, token: string | null | undefined): void {
+    if (!token) return;
     this.storage.set(this.tokenKey(quizId), token);
   }
 
   /** Deletes player token for quiz. */
-  removeToken(quizId: number | null | undefined): void {
-    if (!quizId) return;
+  private removeToken(quizId: number): void {
     this.storage.remove(this.tokenKey(quizId));
+  }
+
+  /** Moves old single-quiz player name to per-quiz key. */
+  private migrateLegacySession(): void {
+    const name = this.storage.getString('QuizStrike_player');
+    if (!name) return;
+
+    const quizId = this.getRunningQuiz();
+    if (quizId) this.setPlayer(quizId, name);
+    this.storage.remove('QuizStrike_player');
+  }
+
+  /** localStorage key for quiz player name. */
+  private playerKey(quizId: number): string {
+    return `QuizStrike_player_${quizId}`;
   }
 
   /** localStorage key for quiz token. */

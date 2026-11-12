@@ -1,0 +1,91 @@
+input {
+    transition: all 350ms ease-in-out;
+    box-shadow: 0 0 0 4px #d47108;
+    outline: none;
+
+    &:focus {
+        box-shadow: 0 0 0 4px white;
+    }
+}
+
+.pill {
+    z-index: 1;
+    position: relative;
+    outline: none;
+    border: 6px solid #1c1c1c;
+    background-color: #1c1c1c;
+    overflow: hidden;
+    transition: all 350ms ease-in-out;
+    box-shadow: 0 0 0 4px #d47108;
+}
+
+.pill::before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    transform-origin: center;
+    transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 0);
+    transition: all 425ms ease-in-out;
+}
+
+.pill:not(:disabled)::before {
+    background-color: #d47108;
+}
+
+.pill:not(:disabled):hover {
+    cursor: pointer;
+    color: #1c1c1c;
+}
+
+.pill:not(:disabled):hover::before {
+    transform: translate3d(-50%, -50%, 0) scale3d(20, 20, 20);
+}
+
+.pill:disabled {
+    opacity: 0.6;
+    color: #ffffff;
+}
+
+.pill:disabled::before {
+    transform: none !important;
+}
+.back {
+    z-index: 1;
+    position: relative;
+    color: white;
+    outline: none;
+    border: 3px solid #1c1c1c;
+    background-color: #1c1c1c;
+    overflow: hidden;
+    transition: all 450ms ease-in-out;
+    box-shadow: 0 0 0 2px #d47108;
+}
+
+.back::before {
+    content: "";
+    z-index: -1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background-color: #d47108;
+    transform-origin: center;
+    transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 0);
+    transition: transform 525ms ease-in-out;
+}
+
+.back:hover {
+    cursor: pointer;
+    color: #1c1c1c;
+}
+
+.back:hover::before {
+    transform: translate3d(-50%, -50%, 0) scale3d(10, 10, 10);
+}
