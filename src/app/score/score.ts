@@ -29,11 +29,13 @@ export class ScoreComponent implements OnInit, OnDestroy {
     public nav: NavigationService
   ) { }
 
+  /** Loads scores, refreshes every 5 s. */
   ngOnInit(): void {
     this.getScores();
     this.refreshSub = interval(5000).subscribe(() => this.getScores());
   }
 
+  /** Fetches scores from API, toggles loading state. */
   getScores(): void {
     this.setLoading(true);
 
@@ -45,6 +47,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
       });
   }
 
+  /** Sorts, updates and animates loaded scores. */
   onScoresLoaded(data: Interfaces.Score[]): void {
     const sortedData = this.sortScores(data);
 
@@ -53,6 +56,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
     this.animateScoreRows(sortedData);
   }
 
+  /** Sorted copy: highest score first, then fastest time. */
   sortScores(data: Interfaces.Score[]): Interfaces.Score[] {
     return [...data].sort((a, b) => {
       if (b.score !== a.score) {
@@ -62,12 +66,14 @@ export class ScoreComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Stores initial row positions on first load. */
   initializePreviousPositions(data: Interfaces.Score[]): void {
     if (!this.previousPositions || Object.keys(this.previousPositions).length === 0) {
       data.forEach((s, i) => this.previousPositions[s.id] = i);
     }
   }
 
+  /** Updates changed scores in place (highlight for 1 s), or replaces list if count changed. */
   updateScores(data: Interfaces.Score[]): void {
     if (this.scores.length === data.length) {
       data.forEach((updated) => {
@@ -89,6 +95,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Moves rows to new positions, adds up/down animation, resizes container. */
   animateScoreRows(data: Interfaces.Score[]): void {
     const rowHeight = window.innerWidth < 640 ? 2.375 : 3;
 
@@ -113,6 +120,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** Formats ms as `m:ss.mmm`. */
   formatTime(ms: number): string {
     const minutes = Math.floor(ms / 60000);
     const seconds = Math.floor((ms % 60000) / 1000);
@@ -121,11 +129,13 @@ export class ScoreComponent implements OnInit, OnDestroy {
     return `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`;
   }
 
+  /** Sets loading flag, re-renders. */
   setLoading(value: boolean): void {
     this.loading = value;
     this.cdr.detectChanges();
   }
 
+  /** Stops auto-refresh. */
   ngOnDestroy(): void {
     this.refreshSub?.unsubscribe();
   }

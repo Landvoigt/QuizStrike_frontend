@@ -17,6 +17,7 @@ export class AlertBoxComponent implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef, private alert: AlertService) { }
 
+  /** Shows incoming alerts, auto-closes after 4 s. */
   ngOnInit(): void {
     this.alert.getAlert().subscribe((alert: Interfaces.Alert | null) => {
       if (alert) {
@@ -35,6 +36,7 @@ export class AlertBoxComponent implements OnInit {
     });
   }
 
+  /** Hides alert. */
   close() {
     this.message = '';
     this.cdr.detectChanges();

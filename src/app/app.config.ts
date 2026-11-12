@@ -19,7 +19,6 @@ export const appConfig: ApplicationConfig = {
         showDialog: false,
       }),
     },
-    // Instantiate Sentry's TraceService at startup so route changes are traced.
     provideAppInitializer(() => {
       inject(Sentry.TraceService);
     }),

@@ -16,31 +16,37 @@ export class RestService {
 
   constructor(private http: HttpClient) { }
 
+  /** Backend base URL (for media). */
   getBaseUrl(): string {
     return this.baseUrl;
   }
 
+  /** GET active quizzes. */
   getQuizzes(): Observable<Interfaces.Quiz[]> {
     return this.http.get<Interfaces.Quiz[]>(`${this.apiBaseUrl}/quiz/`);
   }
 
+  /** GET scores. */
   getScores(): Observable<Interfaces.Score[]> {
     return this.http.get<Interfaces.Score[]>(`${this.apiBaseUrl}/score/`);
   }
 
-  /** Join a quiz. Pass an existing token (e.g. after reload) so the name is recognised as ours. */
+  /** POST `/player/`: joins quiz; existing token keeps name ours. */
   getGame(data: { name: string; quizId: number | null }, token?: string | null): Observable<Interfaces.Game> {
     return this.http.post<Interfaces.Game>(`${this.apiBaseUrl}/player/`, data, { headers: this.tokenHeaders(token) });
   }
 
+  /** POST `/start/`: next question, starts server timer. */
   startQuestion(response: Models.QuestionStartModel, token: string | null): Observable<Interfaces.QuestionStart> {
     return this.http.post<Interfaces.QuestionStart>(`${this.apiBaseUrl}/start/`, response, { headers: this.tokenHeaders(token) });
   }
 
+  /** POST `/finish/`: submits answer, returns result. */
   finishQuestion(response: Models.QuestionFinishModel, token: string | null): Observable<Interfaces.QuestionFinishResult> {
     return this.http.post<Interfaces.QuestionFinishResult>(`${this.apiBaseUrl}/finish/`, response, { headers: this.tokenHeaders(token) });
   }
 
+  /** Headers with `X-Player-Token` if token given. */
   private tokenHeaders(token?: string | null): HttpHeaders {
     let headers = new HttpHeaders();
     if (token) headers = headers.set(this.PLAYER_TOKEN_HEADER, token);

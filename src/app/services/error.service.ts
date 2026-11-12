@@ -12,6 +12,7 @@ export class ErrorService {
 
   constructor(private alert: AlertService) { }
 
+  /** Shows error alert: string, API `error`/`detail`, or generic fallback. */
   handleError(error: any): void {
     let errMsg: string | undefined;
 

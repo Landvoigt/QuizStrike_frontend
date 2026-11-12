@@ -14,10 +14,12 @@ export class Overlay implements OnInit {
 
   constructor(private cdr: ChangeDetectorRef) { }
 
+  /** Starts countdown. */
   ngOnInit(): void {
     this.startCountdown();
   }
 
+  /** Shows 3-2-1-Go (1 s each), then hides overlay. */
   startCountdown(): void {
     const showNext = () => {
       this.currentIndex++;

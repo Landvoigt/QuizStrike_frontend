@@ -35,10 +35,12 @@ export class MenuComponent implements OnInit {
     private storage: StorageService
   ) { }
 
+  /** Restores running game, if any. */
   ngOnInit(): void {
     this.tryRestorePlayer();
   }
 
+  /** Prefills name, listens for restored game. */
   private tryRestorePlayer(): void {
     if (!this.getPlayer() || !this.getQuiz()) return;
     this.playerName = this.getPlayer();
@@ -47,6 +49,7 @@ export class MenuComponent implements OnInit {
     this.gameService.game$.subscribe((game) => this.onGameLoaded(game));
   }
 
+  /** Stores restored game + its quiz. */
   onGameLoaded(game: Interfaces.Game | null): void {
     if (!game) return;
 
@@ -59,11 +62,13 @@ export class MenuComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  /** Selects quiz, shows name input. */
   selectQuiz(quiz: Interfaces.Quiz): void {
     this.selectedQuiz = quiz;
     this.showInput = true;
   }
 
+  /** Joins selected quiz with entered name (+ stored token). */
   register(nameInput: NgModel): void {
     if (!nameInput.valid || !this.playerName.trim()) return;
 
@@ -77,6 +82,7 @@ export class MenuComponent implements OnInit {
       });
   }
 
+  /** Opens game, stays in menu if quiz completed. */
   play(): void {
     if (this.game?.quiz_completed) {
       this.nav.menu();
@@ -86,6 +92,7 @@ export class MenuComponent implements OnInit {
     this.nav.game();
   }
 
+  /** Stores game; error if all questions answered, else saves player. */
   onRegistrationSuccess(game: Interfaces.Game): void {
     this.gameService.setGame(game);
     this.game = game;
@@ -99,6 +106,7 @@ export class MenuComponent implements OnInit {
     }
   }
 
+  /** Shows error (409 = name taken), clears name. */
   onRegistrationError(err: any): void {
     if (err?.status === 409) {
       this.error.handleError(this.error.NAME_TAKEN);
@@ -109,14 +117,17 @@ export class MenuComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
+  /** Stored player name. */
   getPlayer(): string {
     return this.storage.getString('QuizStrike_player');
   }
 
+  /** Stored running quiz id. */
   getQuiz(): number {
     return this.storage.getNumber('QuizStrike_runningQuizId');
   }
 
+  /** Saves player name + quiz id. */
   setValues(): void {
     this.storage.set('QuizStrike_player', this.playerName.trim());
     this.storage.set('QuizStrike_runningQuizId', this.game?.quiz.id.toString() ?? '');

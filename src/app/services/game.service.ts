@@ -27,10 +27,12 @@ export class GameService {
     this.restoreGame();
   }
 
+  /** Loads initial data. */
   initialize(): void {
     this.getQuizzes();
   }
 
+  /** Fetches quizzes into `quizzes$`. */
   private getQuizzes(): void {
     this.rest.getQuizzes().subscribe({
       next: (data) => {
@@ -40,15 +42,18 @@ export class GameService {
     });
   }
 
+  /** Stores game + its token, emits on `game$`. */
   setGame(game: Interfaces.Game): void {
     this.setToken(game.quiz?.id, game.token);
     this.gameSubject.next(game);
   }
 
+  /** Current game, if any. */
   getGame(): Interfaces.Game | null {
     return this.gameSubject.getValue();
   }
 
+  /** Rejoins stored game after reload; 409/404 reset session. */
   restoreGame(): void {
     const quizId = this.getQuiz();
     if (!this.getPlayer() || !quizId) return;
@@ -65,11 +70,9 @@ export class GameService {
       },
       error: (err) => {
         if (err?.status === 409) {
-          // Name belongs to someone else (or our token got lost) -> pick a new name.
           this.resetSession({ dropToken: true });
           this.error.handleError(this.error.NAME_TAKEN);
         } else if (err?.status === 404) {
-          // Quiz no longer exists / inactive.
           this.resetSession();
           this.error.handleError(err);
         } else {
@@ -80,10 +83,7 @@ export class GameService {
     });
   }
 
-  /**
-   * Forget the running game (player name + quiz). Tokens are kept per quiz so the
-   * player can rejoin with the same name later, unless `dropToken` is set.
-   */
+  /** Forgets running game; keeps token unless `dropToken`. */
   resetSession(options: { dropToken?: boolean } = {}): void {
     if (options.dropToken) {
       this.removeToken(this.getQuiz());
@@ -93,30 +93,35 @@ export class GameService {
     this.gameSubject.next(null);
   }
 
+  /** Stored player name. */
   getPlayer(): string {
     return this.storage.getString('QuizStrike_player');
   }
 
+  /** Stored running quiz id. */
   getQuiz(): number {
     return this.storage.getNumber('QuizStrike_runningQuizId');
   }
 
-  /** Player token for the given quiz (defaults to the running quiz). */
+  /** Player token for quiz (default: running quiz). */
   getToken(quizId: number | null | undefined = this.getQuiz()): string | null {
     if (!quizId) return null;
     return this.storage.getString(this.tokenKey(quizId)) || null;
   }
 
+  /** Saves player token for quiz. */
   setToken(quizId: number | null | undefined, token: string | null | undefined): void {
     if (!quizId || !token) return;
     this.storage.set(this.tokenKey(quizId), token);
   }
 
+  /** Deletes player token for quiz. */
   removeToken(quizId: number | null | undefined): void {
     if (!quizId) return;
     this.storage.remove(this.tokenKey(quizId));
   }
 
+  /** localStorage key for quiz token. */
   private tokenKey(quizId: number): string {
     return `QuizStrike_token_${quizId}`;
   }

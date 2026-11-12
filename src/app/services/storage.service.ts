@@ -5,6 +5,7 @@ import { Injectable } from '@angular/core';
 })
 export class StorageService {
 
+  /** Saves value (objects as JSON). */
   set(key: string, value: string | number | object): void {
     try {
       if (typeof value === 'object') {
@@ -17,6 +18,7 @@ export class StorageService {
     }
   }
 
+  /** String value or fallback. */
   getString(key: string, fallback = ''): string {
     try {
       return localStorage.getItem(key) ?? fallback;
@@ -26,6 +28,7 @@ export class StorageService {
     }
   }
 
+  /** Number value or fallback (also if not numeric). */
   getNumber(key: string, fallback = 0): number {
     try {
       const raw = localStorage.getItem(key);
@@ -39,6 +42,7 @@ export class StorageService {
     }
   }
 
+  /** Parsed JSON value or fallback. */
   getJson<T>(key: string, fallback: T): T {
     try {
       const raw = localStorage.getItem(key);
@@ -51,6 +55,7 @@ export class StorageService {
     }
   }
 
+  /** Removes key. */
   remove(key: string): void {
     try {
       localStorage.removeItem(key);
@@ -59,6 +64,7 @@ export class StorageService {
     }
   }
 
+  /** Clears all keys. */
   clear(): void {
     try {
       localStorage.clear();

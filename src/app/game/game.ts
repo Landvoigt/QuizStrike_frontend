@@ -63,6 +63,7 @@ export class GameComponent implements OnInit, OnDestroy {
     private storage: StorageService
   ) { }
 
+  /** Waits for game data; back to menu if none after 3 s. */
   ngOnInit(): void {
     if (!this.getPlayer() || !this.getQuiz()) {
       this.nav.menu();
@@ -78,6 +79,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.gameService.game$.subscribe((game) => this.onGameLoaded(game, timeout));
   }
 
+  /** Stores loaded game, cancels menu fallback. */
   onGameLoaded(game: Interfaces.Game | null, timeout: any): void {
     if (!game) return;
 
@@ -87,21 +89,35 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** Starts quiz from start screen. */
   async startGame(): Promise<void> {
     await this.nextStep();
   }
 
+  /** Loads next question and flips to it; menu when quiz completed. */
   async nextStep(): Promise<void> {
     if (!this.game || this.inProgress() || this.isStarted) return;
 
     this.isStarted = true;
 
-    let response;
+    const response = await this.fetchQuestion();
+    if (!response) return;
 
+    if (response.quiz_completed) {
+      this.finishQuiz();
+      return;
+    }
+
+    await this.showQuestion(response);
+  }
+
+  /** Calls `/start/`; null on error (403 → back to name input). */
+  async fetchQuestion(): Promise<Interfaces.QuestionStart | null> {
     try {
       const payload = new Models.QuestionStartModel(this.getPlayer(), this.getQuiz());
-      response = await firstValueFrom(this.rest.startQuestion(payload, this.gameService.getToken()));
+      const response = await firstValueFrom(this.rest.startQuestion(payload, this.gameService.getToken()));
       this.startScreen = false;
+      return response;
     } catch (err: any) {
       this.isStarted = false;
       if (err?.status === 403) {
@@ -109,26 +125,33 @@ export class GameComponent implements OnInit, OnDestroy {
       } else {
         this.error.handleError(err);
       }
-      return;
+      return null;
     }
+  }
 
-    if (response.quiz_completed) {
-      this.gameService.resetSession();
-      this.nav.menu();
-      return;
-    }
+  /** Ends session, back to menu. */
+  finishQuiz(): void {
+    this.gameService.resetSession();
+    this.nav.menu();
+  }
 
+  /** Preloads image, resets state, flips to question. */
+  async showQuestion(response: Interfaces.QuestionStart): Promise<void> {
     await this.preloadImage(this.imageUrl(response));
 
     this.clearAll();
 
     this.isFlipping = true;
-
     this.currentQuestion = response;
 
     await Promise.resolve();
-    this.cdr.detectChanges();
 
+    this.cdr.detectChanges();
+    this.flip();
+  }
+
+  /** Rotates cards by 180°, swaps visible side. */
+  flip(): void {
     this.step++;
     this.flipRotation = `rotateX(${this.step * 180}deg)`;
     this.isQuestionSide = !this.isQuestionSide;
@@ -136,6 +159,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** Flip done → question visible, starts timer. */
   onFlipFinished(event: TransitionEvent): void {
     if (event.propertyName !== 'transform') return;
     if (!this.isFlipping) return;
@@ -145,19 +169,10 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** Selects answer, stops timer, submits. */
   answer(idx: number): void {
-    if (!this.timerActive || this.timePaused || this.selectedAnswerIdx !== null) return;
-
-    if (!this.currentQuestion) {
-      console.warn('No current question available.');
-      return;
-    }
-
-    const answers = this.currentQuestion.question.answers;
-    if (!answers || idx < 0 || idx >= answers.length) {
-      console.warn('Invalid answer index:', idx);
-      return;
-    }
+    const selected = this.getAnswer(idx);
+    if (!selected) return;
 
     const elapsed = this.elapsed();
     this.stopTimer();
@@ -165,14 +180,27 @@ export class GameComponent implements OnInit, OnDestroy {
     this.selectedAnswerIdx = idx;
     this.cdr.detectChanges();
 
-    this.sendResponse(answers[idx], elapsed);
+    this.sendResponse(selected, elapsed);
   }
 
+  /** Answer at index; null if timer not running, already answered or invalid. */
+  getAnswer(idx: number): Interfaces.Answer | null {
+    if (!this.timerActive || this.timePaused || this.selectedAnswerIdx !== null) return null;
+
+    const answers = this.currentQuestion?.question?.answers;
+    if (!answers || idx < 0 || idx >= answers.length) {
+      console.warn('Invalid answer index:', idx);
+      return null;
+    }
+
+    return answers[idx];
+  }
+
+  /** Sends answer (null = timeout) to `/finish/`. */
   sendResponse(answer: Interfaces.Answer | null, elapsed: number): void {
     if (!this.currentQuestion || !this.game) return;
 
-    const limit = this.timeLimit();
-    const time = answer ? Math.min(Math.max(0, Math.round(elapsed)), limit) : limit;
+    const time = this.responseTime(answer, elapsed);
     this.buildFormattedTime(time);
 
     const payload = this.buildQuestionFinish(answer, time);
@@ -183,6 +211,13 @@ export class GameComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Submitted time in ms: rounded + capped, time limit on timeout. */
+  responseTime(answer: Interfaces.Answer | null, elapsed: number): number {
+    const limit = this.timeLimit();
+    return answer ? Math.min(Math.max(0, Math.round(elapsed)), limit) : limit;
+  }
+
+  /** Marks right/wrong answer, shows stored time. */
   showResult(result: Interfaces.QuestionFinishResult): void {
     const answers = this.currentQuestion?.question?.answers ?? [];
     const correctIdx = answers.findIndex(a => a.id === result.correct_answer_id);
@@ -198,24 +233,25 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** `/finish/` error: 409 = already sent (ok), 403 = invalid token, else alert. */
   onFinishError(err: any): void {
+    this.isStarted = false;
+
     if (err?.status === 409) {
-      this.isStarted = false;
       this.cdr.detectChanges();
       return;
     }
 
     if (err?.status === 403) {
-      this.isStarted = false;
       this.handleInvalidToken();
       return;
     }
 
     this.error.handleError(err);
-    this.isStarted = false;
     this.cdr.detectChanges();
   }
 
+  /** Drops session + token, back to name input. */
   handleInvalidToken(): void {
     this.stopTimer();
     this.gameService.resetSession({ dropToken: true });
@@ -223,6 +259,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.nav.menu();
   }
 
+  /** Starts display loop + timeout deadline. */
   startTimer(): void {
     this.stopTimer();
 
@@ -232,15 +269,18 @@ export class GameComponent implements OnInit, OnDestroy {
     this.startTime = performance.now();
 
     this.timerTimeoutId = setTimeout(() => this.handleTimeout(), this.timeLimit());
-
-    const tick = () => {
-      if (!this.timerActive) return;
-      this.renderTime(this.elapsed());
-      this.timerFrameId = requestAnimationFrame(tick);
-    };
-    this.timerFrameId = requestAnimationFrame(tick);
+    this.timerFrameId = requestAnimationFrame(() => this.tick());
   }
 
+  /** One frame: renders time, schedules next frame. */
+  tick(): void {
+    if (!this.timerActive) return;
+
+    this.renderTime(this.elapsed());
+    this.timerFrameId = requestAnimationFrame(() => this.tick());
+  }
+
+  /** Stops loop + deadline, pauses progress bar. */
   stopTimer(): void {
     if (!this.timerActive) return;
 
@@ -252,10 +292,12 @@ export class GameComponent implements OnInit, OnDestroy {
     this.timePaused = true;
   }
 
+  /** Ms since timer start. */
   elapsed(): number {
     return performance.now() - this.startTime;
   }
 
+  /** Writes time into counter text node, no change detection. */
   renderTime(elapsed: number): void {
     this.formattedTime = this.formatTime(elapsed);
     const textNode = this.counterRef?.nativeElement.firstChild;
@@ -264,6 +306,7 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Time up: stops timer, submits without answer. */
   handleTimeout(): void {
     this.stopTimer();
 
@@ -272,6 +315,7 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
+  /** Resets answer + timer state for next question. */
   clearAll(): void {
     this.selectedAnswerIdx = null;
     this.selectedAnswerCorrect = null;
@@ -283,15 +327,18 @@ export class GameComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
+  /** Current question's time limit in ms (fallback 10 s). */
   timeLimit(): number {
     return this.currentQuestion?.question?.time || this.DEFAULT_TIME_LIMIT;
   }
 
+  /** Sets displayed time, re-renders. */
   buildFormattedTime(elapsed: number): void {
     this.formattedTime = this.formatTime(elapsed);
     this.cdr.detectChanges();
   }
 
+  /** Formats ms as `ss.mmm`, capped at time limit. */
   formatTime(elapsed: number): string {
     const capped = Math.floor(Math.min(Math.max(0, elapsed), this.timeLimit()));
     const seconds = Math.floor(capped / 1000);
@@ -299,6 +346,7 @@ export class GameComponent implements OnInit, OnDestroy {
     return `${this.pad(seconds)}.${this.pad(milliseconds, 3)}`;
   }
 
+  /** Loads + decodes image, waits max. 400 ms. */
   async preloadImage(url: string | null): Promise<void> {
     if (!url) return;
 
@@ -309,6 +357,7 @@ export class GameComponent implements OnInit, OnDestroy {
     await Promise.race([img.decode().catch(() => undefined), timeout]);
   }
 
+  /** Builds `/finish/` payload. */
   buildQuestionFinish(answer: Interfaces.Answer | null, time: number): Models.QuestionFinishModel {
     return new Models.QuestionFinishModel({
       response_id: this.currentQuestion?.response_id ?? 0,
@@ -317,39 +366,47 @@ export class GameComponent implements OnInit, OnDestroy {
     });
   }
 
+  /** Stored player name. */
   getPlayer(): string {
     return this.storage.getString('QuizStrike_player');
   }
 
+  /** Stored running quiz id. */
   getQuiz(): number {
     return this.storage.getNumber('QuizStrike_runningQuizId');
   }
 
+  /** Open questions as text for start screen. */
   getRemainingQuestionsCount(): string {
     if (!this.game) return '';
     return String(this.game.total_questions - this.game.answered_questions);
   }
 
+  /** Left-pads number with zeros. */
   pad(num: number, size: number = 2): string {
     let s = num.toString();
     while (s.length < size) s = '0' + s;
     return s;
   }
 
+  /** Question image URL, falls back to category image. */
   imageUrl(question: Interfaces.QuestionStart | null): string | null {
     const image = question?.question?.image || question?.question?.category?.image;
     return image ? this.rest.getBaseUrl() + image : null;
   }
 
+  /** CSS `background-image` value for question. */
   background(question: Interfaces.QuestionStart | null): string {
     const url = this.imageUrl(question);
     return url ? `url(${url})` : 'none';
   }
 
+  /** True while flipping or timer running. */
   inProgress(): boolean {
     return this.timerActive && (this.isFlipping || this.timeRunning);
   }
 
+  /** Stops timer on leave. */
   ngOnDestroy(): void {
     this.stopTimer();
   }
