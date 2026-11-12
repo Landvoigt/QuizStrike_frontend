@@ -73,7 +73,7 @@ export class ScoreComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Updates changed scores in place (highlight for 1 s), or replaces list if count changed. */
+  /** Updates changed scores in place, or replaces list if count changed. */
   updateScores(data: Interfaces.Score[]): void {
     if (this.scores.length === data.length) {
       data.forEach((updated) => {
@@ -81,16 +81,10 @@ export class ScoreComponent implements OnInit, OnDestroy {
         if (old && (old.score !== updated.score || old.time !== updated.time)) {
           old.score = updated.score;
           old.time = updated.time;
-          old.justUpdated = true;
-
-          setTimeout(() => {
-            old.justUpdated = false;
-            this.cdr.detectChanges();
-          }, 1000);
         }
       });
     } else {
-      this.scores = data.map(s => ({ ...s, justUpdated: false }));
+      this.scores = [...data];
       this.cdr.detectChanges();
     }
   }
