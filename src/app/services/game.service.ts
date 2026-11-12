@@ -61,11 +61,13 @@ export class GameService {
     );
   }
 
-  /** Restore error: 409 = name taken, 404 = player gone. */
+  /** Restore error: 409 = name taken, 404 = player gone, 429 = rate limit. */
   private onRestoreError(quizId: number, err: any): void {
     if (err?.status === 409) {
       this.leave(quizId, { dropToken: true });
       this.error.handleError(this.error.NAME_TAKEN);
+    } else if (err?.status === 429) {
+      this.error.handleError(this.error.tooManyPlayers(err.error?.retry_after));
     } else if (err?.status === 404) {
       this.leave(quizId);
       this.error.handleError(err);

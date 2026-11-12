@@ -81,12 +81,14 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.play();
   }
 
-  /** Shows error (409 = name taken, 400 = invalid name), clears name. */
+  /** Shows error (409 = name taken, 400 = invalid name, 429 = rate limit), clears name. */
   onJoinError(err: any): void {
     if (err?.status === 409) {
       this.error.handleError(this.error.NAME_TAKEN);
     } else if (err?.status === 400) {
       this.error.handleError(this.error.INVALID_NAME);
+    } else if (err?.status === 429) {
+      this.error.handleError(this.error.tooManyPlayers(err.error?.retry_after));
     } else {
       this.error.handleError(err);
     }
