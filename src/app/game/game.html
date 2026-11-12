@@ -1,7 +1,7 @@
 <div class="h-full w-full flex justify-center items-center">
     <div class="flex flex-col justify-center items-center h-screen w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 py-12 md:px-8 sm:px-6 px-4">
         <div class="relative w-full md:h-96 sm:h-75 h-full perspective">
-            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation"
+            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d will-change-transform" [style.transform]="flipRotation"
                 (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
@@ -20,7 +20,7 @@
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
                         shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden" 
-                        (click)="nextStep()" [class.cursor-pointer]="!timerSubscription">
+                        (click)="nextStep()" [class.cursor-pointer]="!timerActive">
                         @if (!isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="questionContent"></ng-container>
                         }
@@ -30,7 +30,7 @@
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
                         shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white rotate-x-180 backface-hidden" 
-                        (click)="nextStep()" [class.cursor-pointer]="!timerSubscription">
+                        (click)="nextStep()" [class.cursor-pointer]="!timerActive">
                         @if (isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="questionContent"></ng-container>
                         }
@@ -39,12 +39,14 @@
             </div>
         </div>
 
-        <div class="z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 w-[82%] bg-[#2c2c2c] sm:rounded-[16rem] rounded-[4rem] sm:mt-2 sm:mb-2 mt-1 mb-1">
+        <div class="relative z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 w-[82%] bg-[#2c2c2c] sm:rounded-[16rem] rounded-[4rem] sm:mt-2 sm:mb-2 mt-1 mb-1"
+            [style.--progress-duration]="timeLimit() + 'ms'">
             <span class="time-progress" [class.time-progress-animation]="timeRunning" [class.time-progress-paused]="timePaused"></span>
+            <span class="time-progress-head" [class.time-progress-animation]="timeRunning" [class.time-progress-paused]="timePaused"></span>
         </div>
 
         <div class="z-50 relative w-full md:h-96 sm:h-75 h-full perspective">
-            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d" [style.transform]="flipRotation" 
+            <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d will-change-transform" [style.transform]="flipRotation" 
                 (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#d47108] 
@@ -176,7 +178,7 @@
 
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                 <div class="flex justify-center items-center md:text-4xl sm:text-3xl text-xl text-white text-shadow-md/100 font-bold">
-                    <span class="counter">{{ formattedTime }}</span>
+                    <span #counter class="counter">{{ formattedTime }}</span>
                 </div>
             </div>
         </div>

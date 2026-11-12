@@ -1,6 +1,6 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { firstValueFrom, interval, Subscription } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 import { GameService } from '../services/game.service';
 import { RestService } from '../services/rest.service';
@@ -32,7 +32,11 @@ export class GameComponent implements OnInit, OnDestroy {
   isTransitioning: boolean = false;
   isStarted: boolean = false;
 
-  timerSubscription?: Subscription;
+  @ViewChild('counter') counterRef?: ElementRef<HTMLElement>;
+
+  timerActive: boolean = false;
+  private timerFrameId: number | null = null;
+  private timerTimeoutId: ReturnType<typeof setTimeout> | null = null;
   startTime!: number;
 
   formattedTime: string = '00.000';
@@ -48,6 +52,7 @@ export class GameComponent implements OnInit, OnDestroy {
   flipRotation: string = 'rotateX(0deg)';
 
   DEFAULT_TIME_LIMIT: number = 10000;
+  IMAGE_PRELOAD_TIMEOUT: number = 400;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -94,7 +99,6 @@ export class GameComponent implements OnInit, OnDestroy {
     let response;
 
     try {
-      // Only fetch the question right before showing it: the server starts measuring here.
       const payload = new Models.QuestionStartModel(this.getPlayer(), this.getQuiz());
       response = await firstValueFrom(this.rest.startQuestion(payload, this.gameService.getToken()));
       this.startScreen = false;
@@ -113,6 +117,8 @@ export class GameComponent implements OnInit, OnDestroy {
       this.nav.menu();
       return;
     }
+
+    await this.preloadImage(this.imageUrl(response));
 
     this.clearAll();
 
@@ -134,15 +140,13 @@ export class GameComponent implements OnInit, OnDestroy {
     if (event.propertyName !== 'transform') return;
     if (!this.isFlipping) return;
 
-    // The question is now visible -> start the timer.
     this.isFlipping = false;
     this.startTimer();
     this.cdr.detectChanges();
   }
 
   answer(idx: number): void {
-    // Answers are only accepted while the timer of the visible question is running.
-    if (!this.timerSubscription || this.timePaused || this.selectedAnswerIdx !== null) return;
+    if (!this.timerActive || this.timePaused || this.selectedAnswerIdx !== null) return;
 
     if (!this.currentQuestion) {
       console.warn('No current question available.');
@@ -155,7 +159,7 @@ export class GameComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const elapsed = Date.now() - this.startTime;
+    const elapsed = this.elapsed();
     this.stopTimer();
 
     this.selectedAnswerIdx = idx;
@@ -164,7 +168,6 @@ export class GameComponent implements OnInit, OnDestroy {
     this.sendResponse(answers[idx], elapsed);
   }
 
-  /** Sends the answer; correct/incorrect is only known from the server's reply. */
   sendResponse(answer: Interfaces.Answer | null, elapsed: number): void {
     if (!this.currentQuestion || !this.game) return;
 
@@ -188,12 +191,15 @@ export class GameComponent implements OnInit, OnDestroy {
     this.selectedAnswerCorrect = result.correct;
     this.showCorrectAnswer = !result.correct;
     this.isStarted = false;
+
+    if (typeof result.time === 'number') {
+      this.formattedTime = this.formatTime(result.time);
+    }
     this.cdr.detectChanges();
   }
 
   onFinishError(err: any): void {
     if (err?.status === 409) {
-      // Already submitted (double click / retry) -> treat as success.
       this.isStarted = false;
       this.cdr.detectChanges();
       return;
@@ -222,26 +228,40 @@ export class GameComponent implements OnInit, OnDestroy {
 
     this.timeRunning = true;
     this.timePaused = false;
-    this.startTime = Date.now();
+    this.timerActive = true;
+    this.startTime = performance.now();
 
-    const maxTime = this.timeLimit();
+    this.timerTimeoutId = setTimeout(() => this.handleTimeout(), this.timeLimit());
 
-    this.timerSubscription = interval(1).subscribe(() => {
-      const elapsed = Date.now() - this.startTime;
-      this.buildFormattedTime(elapsed);
-
-      if (elapsed >= maxTime) {
-        this.handleTimeout();
-      }
-    });
+    const tick = () => {
+      if (!this.timerActive) return;
+      this.renderTime(this.elapsed());
+      this.timerFrameId = requestAnimationFrame(tick);
+    };
+    this.timerFrameId = requestAnimationFrame(tick);
   }
 
   stopTimer(): void {
-    if (!this.timerSubscription) return;
+    if (!this.timerActive) return;
 
-    this.timerSubscription.unsubscribe();
-    this.timerSubscription = undefined;
+    this.timerActive = false;
+    if (this.timerFrameId !== null) cancelAnimationFrame(this.timerFrameId);
+    if (this.timerTimeoutId !== null) clearTimeout(this.timerTimeoutId);
+    this.timerFrameId = null;
+    this.timerTimeoutId = null;
     this.timePaused = true;
+  }
+
+  elapsed(): number {
+    return performance.now() - this.startTime;
+  }
+
+  renderTime(elapsed: number): void {
+    this.formattedTime = this.formatTime(elapsed);
+    const textNode = this.counterRef?.nativeElement.firstChild;
+    if (textNode) {
+      textNode.nodeValue = this.formattedTime;
+    }
   }
 
   handleTimeout(): void {
@@ -268,11 +288,25 @@ export class GameComponent implements OnInit, OnDestroy {
   }
 
   buildFormattedTime(elapsed: number): void {
-    const capped = Math.min(elapsed, this.timeLimit());
+    this.formattedTime = this.formatTime(elapsed);
+    this.cdr.detectChanges();
+  }
+
+  formatTime(elapsed: number): string {
+    const capped = Math.floor(Math.min(Math.max(0, elapsed), this.timeLimit()));
     const seconds = Math.floor(capped / 1000);
     const milliseconds = capped % 1000;
-    this.formattedTime = `${this.pad(seconds)}.${this.pad(milliseconds, 3)}`;
-    this.cdr.detectChanges();
+    return `${this.pad(seconds)}.${this.pad(milliseconds, 3)}`;
+  }
+
+  async preloadImage(url: string | null): Promise<void> {
+    if (!url) return;
+
+    const img = new Image();
+    img.src = url;
+
+    const timeout = new Promise<void>(resolve => setTimeout(resolve, this.IMAGE_PRELOAD_TIMEOUT));
+    await Promise.race([img.decode().catch(() => undefined), timeout]);
   }
 
   buildQuestionFinish(answer: Interfaces.Answer | null, time: number): Models.QuestionFinishModel {
@@ -302,18 +336,18 @@ export class GameComponent implements OnInit, OnDestroy {
     return s;
   }
 
-  background(question: Interfaces.QuestionStart | null): string {
-    if (!question?.question) return 'none';
+  imageUrl(question: Interfaces.QuestionStart | null): string | null {
+    const image = question?.question?.image || question?.question?.category?.image;
+    return image ? this.rest.getBaseUrl() + image : null;
+  }
 
-    if (question.question.image) {
-      return `url(${this.rest.getBaseUrl() + question.question.image})`;
-    } else if (question.question.category.image) {
-      return `url(${this.rest.getBaseUrl() + question.question.category.image})`;
-    } else return 'none';
+  background(question: Interfaces.QuestionStart | null): string {
+    const url = this.imageUrl(question);
+    return url ? `url(${url})` : 'none';
   }
 
   inProgress(): boolean {
-    return !!this.timerSubscription && (this.isFlipping || this.timeRunning);
+    return this.timerActive && (this.isFlipping || this.timeRunning);
   }
 
   ngOnDestroy(): void {

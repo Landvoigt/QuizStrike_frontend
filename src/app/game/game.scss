@@ -22,20 +22,34 @@
 // Time Progress Bar
 .time-progress {
     z-index: 100;
-    width: 0;
+    width: 100%;
     height: 8px;
-    display: inline-block;
+    display: block;
     position: relative;
     background: #fff;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
     box-sizing: border-box;
-    left: 0;
+    transform: scaleX(0);
     transform-origin: left;
     border-radius: 2.5rem;
+    will-change: transform;
 }
 
-.time-progress::after,
-.time-progress::before {
+.time-progress-head {
+    z-index: 100;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 8px;
+    margin-top: -4px;
+    transform: translateX(-100%);
+    pointer-events: none;
+    will-change: transform;
+}
+
+.time-progress-head::after,
+.time-progress-head::before {
     z-index: 100;
     content: "";
     width: 10px;
@@ -49,24 +63,26 @@
     box-sizing: border-box;
 }
 
-.time-progress::before {
+.time-progress-head::before {
     top: -4px;
     transform: rotate(45deg);
 }
 
-.time-progress-animation {
-    animation: forwProg 10s linear forwards;
+.time-progress.time-progress-animation {
+    animation: forwProg var(--progress-duration, 10s) linear forwards;
 }
 
-.time-progress-animation::after,
-.time-progress-animation::before {
-    animation: upwSprink 0.3s linear;
-    animation-iteration-count: calc(10s / 0.3s);
+.time-progress-head.time-progress-animation {
+    animation: headProg var(--progress-duration, 10s) linear forwards;
 }
 
-.time-progress-animation::before {
-    animation: dowSprink 0.3s linear;
-    animation-iteration-count: calc(10s / 0.3s);
+// Sparks loop until the timer is paused (answer / timeout) or reset
+.time-progress-head.time-progress-animation::after {
+    animation: upwSprink 0.3s linear infinite;
+}
+
+.time-progress-head.time-progress-animation::before {
+    animation: dowSprink 0.3s linear infinite;
 }
 
 .time-progress-paused {
@@ -110,10 +126,19 @@
 // Keyframes
 @keyframes forwProg {
     0% {
-        width: 0;
+        transform: scaleX(0);
     }
     100% {
-        width: 100%;
+        transform: scaleX(1);
+    }
+}
+
+@keyframes headProg {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(0);
     }
 }
 
