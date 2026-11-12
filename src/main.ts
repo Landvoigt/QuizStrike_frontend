@@ -8,9 +8,10 @@ import * as Sentry from "@sentry/angular";
 
 Sentry.init({
   dsn: SENTRY_URL,
+  enabled: !isDevMode(),
   integrations: [Sentry.browserTracingIntegration()],
   tracePropagationTargets: SENTRY_TARGET,
-  tracesSampleRate: isDevMode() ? 1.0 : 0.2,
+  tracesSampleRate: 0.2,
   dataCollection: {
     httpHeaders: { request: { deny: ['x-player-token'] }, response: true },
   },
