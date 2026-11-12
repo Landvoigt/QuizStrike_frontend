@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
-import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, ReplaySubject, tap } from 'rxjs';
 import { RestService } from './rest.service';
 import { ErrorService } from './error.service';
 import { StorageService } from './storage.service';
@@ -11,7 +11,7 @@ import * as Interfaces from '../interfaces';
   providedIn: 'root'
 })
 export class GameService {
-  private quizzesSubject = new BehaviorSubject<Interfaces.Quiz[]>([]);
+  private quizzesSubject = new ReplaySubject<Interfaces.Quiz[]>(1);
   quizzes$: Observable<Interfaces.Quiz[]> = this.quizzesSubject.asObservable();
 
   private gamesSubject = new BehaviorSubject<Record<number, Interfaces.Game>>({});
@@ -37,7 +37,7 @@ export class GameService {
     });
   }
 
-  /** Quiz by id from loaded list. */
+  /** Quiz by id; emits once list is loaded, null if not found. */
   quiz$(quizId: number): Observable<Interfaces.Quiz | null> {
     return this.quizzes$.pipe(map(quizzes => quizzes.find(quiz => quiz.id === quizId) ?? null));
   }
@@ -62,16 +62,16 @@ export class GameService {
     );
   }
 
-  /** Restore error: 409 = name taken, 404 = player gone, 429 = rate limit. */
+  /** Restore error: 409 = name taken, 400/404 = quiz or player gone, 429 = rate limit. */
   private onRestoreError(quizId: number, err: any): void {
     if (err?.status === 409) {
       this.leave(quizId, { dropToken: true });
       this.error.handleError(this.error.NAME_TAKEN);
     } else if (err?.status === 429) {
       this.error.handleError(this.error.tooManyPlayers(err.error?.retry_after));
-    } else if (err?.status === 404) {
+    } else if (err?.status === 400 || err?.status === 404) {
       this.leave(quizId);
-      this.error.handleError(err);
+      this.error.handleError(this.error.QUIZ_UNAVAILABLE);
     } else {
       this.error.handleError(err);
     }

@@ -3,7 +3,7 @@
         <h1 class="sm:text-5xl text-3xl text-white text-shadow-lg/100 font-bold">QuizStrike</h1>
 
         <div class="flex flex-wrap justify-center sm:gap-10 gap-8 w-full">
-            @for (quiz of gameService.quizzes$ | async; track quiz.id; let i = $index) {
+            @for (quiz of (gameService.quizzes$ | async) ?? []; track quiz.id; let i = $index) {
                 <button (click)="nav.quiz(quiz.id)" type="button" [style.animationDelay.ms]="i * 85"
                     class="quiz-card relative sm:h-60 h-40 w-full sm:w-[calc((100%_-_2.5rem)/2)] lg:w-[calc((100%_-_5rem)/3)] bg-[#1c1c1c] rounded-[4rem] overflow-hidden text-white
                     md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)]

@@ -41,6 +41,10 @@ export class ScoreComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.quizId = Number(this.route.snapshot.paramMap.get('id'));
     this.quizSub = this.gameService.quiz$(this.quizId).subscribe((quiz) => {
+      if (!quiz) {
+        this.nav.menu();
+        return;
+      }
       this.quiz = quiz;
       this.cdr.detectChanges();
     });
@@ -75,9 +79,9 @@ export class ScoreComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Updates changed scores in place, or replaces list if count changed. */
+  /** Updates changed scores in place, or replaces list if players changed. */
   updateScores(data: Interfaces.Score[]): void {
-    if (this.scores.length === data.length) {
+    if (this.samePlayers(data)) {
       data.forEach((updated) => {
         const old = this.scores.find(s => s.id === updated.id);
         if (old && (old.score !== updated.score || old.time !== updated.time)) {
@@ -89,6 +93,13 @@ export class ScoreComponent implements OnInit, OnDestroy {
       this.scores = [...data];
       this.cdr.detectChanges();
     }
+  }
+
+  /** True if list has exactly the current score ids. */
+  samePlayers(data: Interfaces.Score[]): boolean {
+    if (this.scores.length !== data.length) return false;
+    const ids = new Set(this.scores.map(s => s.id));
+    return data.every(s => ids.has(s.id));
   }
 
   /** Moves rows to new positions, adds up/down animation, resizes container. */

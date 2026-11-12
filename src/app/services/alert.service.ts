@@ -8,6 +8,9 @@ import * as Interfaces from '../interfaces';
 })
 export class AlertService {
   private alertSubject = new BehaviorSubject<Interfaces.Alert | null>(null);
+  private hideTimeoutId: ReturnType<typeof setTimeout> | null = null;
+
+  readonly DURATION: number = 4000;
 
   /** Stream of current alert (null = none). */
   getAlert(): Observable<Interfaces.Alert | null> {
@@ -24,16 +27,22 @@ export class AlertService {
     this.show(error, 'error');
   }
 
-  /** Emits alert, clears it after 4 s. */
+  /** Emits alert, replaces previous one; clears after 4 s. */
   show(message: string, type: 'success' | 'error' | 'info' | 'warning') {
+    this.cancelHide();
     this.alertSubject.next({ message, type });
-    setTimeout(() => {
-      this.alertSubject.next(null);
-    }, 4000);
+    this.hideTimeoutId = setTimeout(() => this.clearAlert(), this.DURATION);
   }
 
   /** Clears current alert. */
   clearAlert() {
+    this.cancelHide();
     this.alertSubject.next(null);
+  }
+
+  /** Stops pending auto-hide. */
+  private cancelHide(): void {
+    if (this.hideTimeoutId !== null) clearTimeout(this.hideTimeoutId);
+    this.hideTimeoutId = null;
   }
 }

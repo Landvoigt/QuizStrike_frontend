@@ -12,6 +12,7 @@ export class ErrorService {
   readonly INVALID_TOKEN: string = 'Your session is invalid. Please enter your name again.';
   readonly GAME_FINISHED: string = 'Game already finished!';
   readonly INVALID_NAME: string = 'Invalid name or quiz. Please try again.';
+  readonly QUIZ_UNAVAILABLE: string = 'This quiz is no longer available.';
   readonly TOO_MANY_PLAYERS: string = 'Too many new players from this network. Please try again';
 
   constructor(private alert: AlertService) { }

@@ -36,9 +36,14 @@ export class QuizComponent implements OnInit, OnDestroy {
     public gameService: GameService
   ) { }
 
-  /** Loads quiz + refreshes stored player's progress. */
+  /** Loads quiz + refreshes stored player's progress; menu if id invalid. */
   ngOnInit(): void {
     this.quizId = Number(this.route.snapshot.paramMap.get('id'));
+
+    if (!Number.isInteger(this.quizId) || this.quizId <= 0) {
+      this.nav.menu();
+      return;
+    }
 
     this.subs.add(this.gameService.quiz$(this.quizId).subscribe((quiz) => this.onQuizLoaded(quiz)));
     this.subs.add(this.gameService.games$.subscribe((games) => this.onGamesChanged(games)));
@@ -46,8 +51,13 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.gameService.restore(this.quizId).subscribe();
   }
 
-  /** Stores quiz, re-renders. */
+  /** Stores quiz, re-renders; menu if quiz doesn't exist. */
   onQuizLoaded(quiz: Interfaces.Quiz | null): void {
+    if (!quiz) {
+      this.nav.menu();
+      return;
+    }
+
     this.quiz = quiz;
     this.cdr.detectChanges();
   }
