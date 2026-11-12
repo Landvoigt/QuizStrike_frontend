@@ -1,11 +1,11 @@
 <div class="w-full flex justify-center">
-    <div class="flex flex-col items-center w-full max-w-7xl sm:gap-12 gap-8 lg:px-16 md:px-12 sm:px-8 px-6 sm:py-16 py-10">
+    <div class="flex flex-col items-center w-full sm:gap-12 gap-8 lg:px-16 md:px-12 sm:px-8 px-6 sm:pt-[12vh] sm:pb-16 py-10">
         <h1 class="sm:text-5xl text-3xl text-white text-shadow-lg/100 font-bold">QuizStrike</h1>
 
-        <div class="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 sm:gap-10 gap-8 w-full">
+        <div class="flex flex-wrap justify-center sm:gap-10 gap-8 w-full">
             @for (quiz of gameService.quizzes$ | async; track quiz.id; let i = $index) {
                 <button (click)="nav.quiz(quiz.id)" type="button" [style.animationDelay.ms]="i * 85"
-                    class="quiz-card relative md:h-80 sm:h-72 h-64 w-full bg-[#1c1c1c] rounded-[4rem] overflow-hidden text-white
+                    class="quiz-card relative sm:h-60 h-40 w-full sm:w-[calc((100%_-_2.5rem)/2)] lg:w-[calc((100%_-_5rem)/3)] bg-[#1c1c1c] rounded-[4rem] overflow-hidden text-white
                     md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)]
                     shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)]">
                     <div class="quiz-image absolute inset-0 bg-cover bg-center bg-no-repeat rounded-[3.5rem] sm:m-3 m-2.5"

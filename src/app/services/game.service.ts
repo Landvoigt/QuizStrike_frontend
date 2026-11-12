@@ -42,9 +42,10 @@ export class GameService {
     return this.quizzes$.pipe(map(quizzes => quizzes.find(quiz => quiz.id === quizId) ?? null));
   }
 
-  /** Joins quiz (+ stored token), stores player + game. */
+  /** Joins quiz (token only for stored name), stores player + game. */
   join(quizId: number, name: string): Observable<Interfaces.Game> {
-    return this.rest.getGame({ name, quizId }, this.getToken(quizId))
+    const token = name === this.getPlayer(quizId) ? this.getToken(quizId) : null;
+    return this.rest.getGame({ name, quizId }, token)
       .pipe(tap(game => this.setGame(quizId, name, game)));
   }
 

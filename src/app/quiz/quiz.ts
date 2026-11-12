@@ -24,6 +24,7 @@ export class QuizComponent implements OnInit, OnDestroy {
   player: string = '';
   playerName: string = '';
   joining: boolean = false;
+  switching: boolean = false;
 
   private subs = new Subscription();
 
@@ -74,6 +75,8 @@ export class QuizComponent implements OnInit, OnDestroy {
 
   /** Opens game, or shows error if all questions answered. */
   onJoined(game: Interfaces.Game): void {
+    this.switching = false;
+
     if (this.gameService.isCompleted(game)) {
       this.error.handleError(this.error.GAME_FINISHED);
       return;
@@ -101,10 +104,15 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.nav.game(this.quizId);
   }
 
-  /** Forgets stored player, shows name input. */
+  /** Shows name input; stored player + token stay. */
   newPlayer(): void {
-    this.gameService.leave(this.quizId, { dropToken: true });
+    this.switching = true;
     this.playerName = '';
+  }
+
+  /** Back to stored player. */
+  cancelNewPlayer(): void {
+    this.switching = false;
   }
 
   /** Stops listeners. */

@@ -7,19 +7,19 @@
         </button>
     </div>
 
-    <div class="flex flex-col sm:justify-center justify-start items-center min-h-screen w-full sm:gap-12 gap-6 text-white
-        sm:py-0 py-16 sm:px-6 px-12">
+    <div class="flex flex-col justify-start items-center min-h-screen w-full sm:gap-12 gap-6 text-white
+        sm:pt-[12vh] sm:pb-16 py-16 sm:px-6 px-12">
         <div class="flex flex-col items-center gap-2 text-center">
             <h1 class="sm:text-5xl text-3xl font-bold text-shadow-lg/100">{{ quiz?.title }}</h1>
             @if (quiz?.description) {
-                <p class="sm:text-xl text-lg text-shadow-md/50">{{ quiz?.description }}</p>
+                <p class="sm:text-xl text-md text-shadow-md/50">{{ quiz?.description }}</p>
             }
             @if (quiz) {
-                <span class="sm:text-lg text-md text-[#d47108] font-bold text-shadow-md/50">{{ quiz.question_count }} Fragen</span>
+                <span class="sm:text-xl text-md text-[#d47108] font-bold text-shadow-md/50">{{ quiz.question_count }} Fragen</span>
             }
         </div>
 
-        @if (!player) {
+        @if (!player || switching) {
             <input [(ngModel)]="playerName" type="text" placeholder="Dein Name..." minlength="3" maxlength="25" #nameInput="ngModel"
                 required (keydown.enter)="register(nameInput)"
                 class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
@@ -31,6 +31,12 @@
                 antialiased pointer pt-0.5 hover:pt-1 disabled:pt-0.5">
                 Starten
             </button>
+            @if (player) {
+                <button (click)="cancelNewPlayer()" type="button"
+                    class="text-sm text-white/60 hover:text-[#d47108] underline underline-offset-4 cursor-pointer transition-colors">
+                    Doch {{ player }}?
+                </button>
+            }
         } @else {
             <div class="flex flex-col items-center gap-3 md:w-108 sm:w-100 w-full">
                 <input [value]="player" type="text" [disabled]="true"
@@ -49,6 +55,8 @@
                 {{ gameService.isCompleted(game) ? 'Abgeschlossen' : 'Quiz starten' }}
             </button>
         }
+
+        <div class="md:w-175 sm:w-135 w-full h-px sm:my-2 my-1 bg-linear-to-r from-transparent via-[#d47108]/60 to-transparent"></div>
 
         <button (click)="nav.score(quizId)" type="button"
             class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
