@@ -44,3 +44,4 @@ Thumbs.db
 
 /src/environment
 /src/config/config.ts
+deploy.bat
