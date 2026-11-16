@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Router, UrlTree } from '@angular/router';
 import { BehaviorSubject, catchError, map, Observable, of, ReplaySubject, tap } from 'rxjs';
 import { RestService } from './rest.service';
@@ -13,16 +13,16 @@ import * as Interfaces from '../interfaces';
 export class GameService {
   private quizzesSubject = new ReplaySubject<Interfaces.Quiz[]>(1);
   quizzes$: Observable<Interfaces.Quiz[]> = this.quizzesSubject.asObservable();
-
+  
   private gamesSubject = new BehaviorSubject<Record<number, Interfaces.Game>>({});
   games$: Observable<Record<number, Interfaces.Game>> = this.gamesSubject.asObservable();
 
-  constructor(
-    private rest: RestService,
-    private error: ErrorService,
-    private storage: StorageService,
-    private router: Router) {
+  private readonly rest = inject(RestService);
+  private readonly error = inject(ErrorService);
+  private readonly storage = inject(StorageService);
+  private readonly router = inject(Router);
 
+  constructor() {
     this.migrateLegacySession();
     this.getQuizzes();
   }

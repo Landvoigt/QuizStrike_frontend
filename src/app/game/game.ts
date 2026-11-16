@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ChangeDetectionStrategy, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ChangeDetectionStrategy, ViewChild, inject } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { firstValueFrom, Subscription } from 'rxjs';
@@ -56,14 +56,12 @@ export class GameComponent implements OnInit, OnDestroy {
   DEFAULT_TIME_LIMIT: number = 10000;
   IMAGE_PRELOAD_TIMEOUT: number = 400;
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private rest: RestService,
-    private error: ErrorService,
-    private nav: NavigationService,
-    private gameService: GameService,
-    private route: ActivatedRoute
-  ) { }
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly rest = inject(RestService);
+  private readonly error = inject(ErrorService);
+  private readonly nav = inject(NavigationService);
+  private readonly gameService = inject(GameService);
+  private readonly route = inject(ActivatedRoute);
 
   /** Loads game of route quiz; back to quiz page if no player. */
   ngOnInit(): void {

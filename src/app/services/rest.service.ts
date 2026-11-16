@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -14,7 +14,7 @@ export class RestService {
   private readonly baseUrl: string = environment.BASE_URL;
   private readonly apiBaseUrl: string = environment.API_BASE_URL;
 
-  constructor(private http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   /** Backend base URL (for media). */
   getBaseUrl(): string {

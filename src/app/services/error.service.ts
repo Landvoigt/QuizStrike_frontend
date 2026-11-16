@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import * as Sentry from '@sentry/angular';
 import { AlertService } from './alert.service';
@@ -15,7 +15,7 @@ export class ErrorService {
   readonly QUIZ_UNAVAILABLE: string = 'This quiz is no longer available.';
   readonly TOO_MANY_PLAYERS: string = 'Too many new players from this network. Please try again';
 
-  constructor(private alert: AlertService) { }
+  private readonly alert = inject(AlertService);
 
   /** Shows error alert: string, API `error`/`detail`, or generic fallback. */
   handleError(error: any): void {

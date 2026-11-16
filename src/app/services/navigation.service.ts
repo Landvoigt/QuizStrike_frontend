@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { Location } from '@angular/common'
 import { filter } from 'rxjs';
@@ -9,7 +9,10 @@ import { filter } from 'rxjs';
 export class NavigationService {
   activePage: string | null = 'menu';
 
-  constructor(private router: Router, private locate: Location) {
+  private readonly router = inject(Router);
+  private readonly locate = inject(Location);
+
+  constructor() {
     this.setupActivePageListener();
   }
 

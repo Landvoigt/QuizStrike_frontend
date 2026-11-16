@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { finalize, interval, Subscription } from 'rxjs';
 
@@ -28,14 +28,12 @@ export class ScoreComponent implements OnInit, OnDestroy {
   quiz: Interfaces.Quiz | null = null;
   private quizSub?: Subscription;
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute,
-    private rest: RestService,
-    private error: ErrorService,
-    private gameService: GameService,
-    public nav: NavigationService
-  ) { }
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly rest = inject(RestService);
+  private readonly error = inject(ErrorService);
+  private readonly gameService = inject(GameService);
+  readonly nav = inject(NavigationService);
 
   /** Loads quiz + its scores, refreshes every 5 s. */
   ngOnInit(): void {

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
 
 import { NavigationService } from '../services/navigation.service';
@@ -15,12 +15,9 @@ import * as Interfaces from '../interfaces';
   styleUrl: './menu.scss',
 })
 export class MenuComponent {
-
-  constructor(
-    private rest: RestService,
-    public nav: NavigationService,
-    public gameService: GameService
-  ) { }
+  private readonly rest = inject(RestService);
+  readonly nav = inject(NavigationService);
+  readonly gameService = inject(GameService);
 
   /** CSS `background-image` value for quiz. */
   background(quiz: Interfaces.Quiz): string {

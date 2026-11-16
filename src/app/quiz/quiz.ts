@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormsModule, NgModel } from '@angular/forms';
 import { finalize, Subscription } from 'rxjs';
@@ -28,13 +28,11 @@ export class QuizComponent implements OnInit, OnDestroy {
 
   private subs = new Subscription();
 
-  constructor(
-    private cdr: ChangeDetectorRef,
-    private route: ActivatedRoute,
-    private error: ErrorService,
-    public nav: NavigationService,
-    public gameService: GameService
-  ) { }
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly route = inject(ActivatedRoute);
+  private readonly error = inject(ErrorService);
+  readonly nav = inject(NavigationService);
+  readonly gameService = inject(GameService);
 
   /** Loads quiz + refreshes stored player's progress; menu if id invalid. */
   ngOnInit(): void {

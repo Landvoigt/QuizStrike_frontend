@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 
 @Component({
   selector: 'app-overlay',
@@ -12,7 +12,7 @@ export class Overlay implements OnInit {
   currentIndex = -1;
   sequence = ['3', '2', '1', 'Go!'];
 
-  constructor(private cdr: ChangeDetectorRef) { }
+  private readonly cdr = inject(ChangeDetectorRef);
 
   /** Starts countdown. */
   ngOnInit(): void {

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NavigationService } from '../services/navigation.service';
 
@@ -10,7 +10,5 @@ import { NavigationService } from '../services/navigation.service';
   styleUrl: './privacy.scss',
 })
 export class PrivacyComponent {
-
-  constructor(public nav: NavigationService) { }
-
+  readonly nav = inject(NavigationService);
 }

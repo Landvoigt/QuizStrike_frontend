@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AlertService } from '../services/alert.service';
 
@@ -15,7 +15,8 @@ export class AlertBoxComponent implements OnInit {
   message: string = '';
   type: 'success' | 'error' | 'info' | 'warning' = 'success';
 
-  constructor(private cdr: ChangeDetectorRef, private alert: AlertService) { }
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly alert = inject(AlertService);
 
   /** Shows incoming alerts; service clears them. */
   ngOnInit(): void {
