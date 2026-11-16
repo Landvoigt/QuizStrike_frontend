@@ -1,35 +1,39 @@
 <div class="h-full w-full flex justify-center items-center">
-    <div class="flex flex-col justify-center items-center h-dvh w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 pt-12 pb-[calc(3rem+env(safe-area-inset-bottom))] md:px-8 sm:px-6 px-4">
-        <div class="relative w-full md:h-96 sm:h-75 h-full perspective">
+    <div class="flex flex-col justify-center items-center h-dvh w-full max-w-7xl md:gap-4 sm:gap-3 gap-2 phone-landscape:gap-2 pt-12 pb-[calc(3rem+env(safe-area-inset-bottom))] md:px-8 sm:px-6 px-4
+        phone-landscape:px-4 phone-landscape:pt-4 phone-landscape:pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <div class="relative w-full md:h-96 sm:h-75 h-full perspective phone-landscape:h-full">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d will-change-transform" [style.transform]="flipRotation"
                 (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
-                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
+                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem]
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
-                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden cursor-pointer" 
+                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] 
+                        phone-landscape:shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden cursor-pointer" 
                         (click)="startGame()">
-                        <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center">
-                            <span class="md:text-3xl sm:text-2xl text-xl mb-4">
+                        <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center phone-landscape:px-6">
+                            <span class="md:text-3xl sm:text-2xl text-xl phone-landscape:text-xl mb-4">
                                 {{ game?.quiz?.title }}
                             </span>
                         </div>
                     </div>
                 } @else {
-                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
+                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem]
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
-                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden" 
+                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] 
+                        phone-landscape:shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white backface-hidden" 
                         (click)="nextStep()" [class.cursor-pointer]="!timerActive">
                         @if (!isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="questionContent"></ng-container>
                         }
                     </div>
 
-                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] 
+                    <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#1c1c1c] sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem]
                         md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#d47108,0_0_4px_rgba(255,255,255,0.5)] 
-                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white rotate-x-180 backface-hidden" 
+                        shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] 
+                        phone-landscape:shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] text-white rotate-x-180 backface-hidden" 
                         (click)="nextStep()" [class.cursor-pointer]="!timerActive">
                         @if (isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="questionContent"></ng-container>
@@ -39,35 +43,36 @@
             </div>
         </div>
 
-        <div class="relative z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 w-[82%] bg-[#2c2c2c] sm:rounded-[16rem] rounded-[4rem] sm:mt-2 sm:mb-2 mt-1 mb-1"
+        <div class="relative z-100 flex flex-col justify-center items-start sm:h-2 h-1.5 phone-landscape:h-1.5 w-[82%] phone-landscape:w-[95%] bg-[#2c2c2c] sm:rounded-[16rem] rounded-[4rem] 
+            phone-landscape:rounded-[4rem] sm:mt-2 sm:mb-2 mt-1 mb-1 phone-landscape:mt-1 phone-landscape:mb-1"
             [style.--progress-duration]="timeLimit() + 'ms'">
             <span class="time-progress" [class.time-progress-animation]="timeRunning" [class.time-progress-paused]="timePaused"></span>
             <span class="time-progress-head" [class.time-progress-animation]="timeRunning" [class.time-progress-paused]="timePaused"></span>
         </div>
 
-        <div class="z-50 relative w-full md:h-96 sm:h-75 h-full perspective">
+        <div class="z-50 relative w-full md:h-96 sm:h-75 h-full perspective phone-landscape:h-full">
             <div class="relative w-full h-full transition-transform duration-700 transform-style-preserve-3d will-change-transform" [style.transform]="flipRotation" 
                 (transitionend)="onFlipFinished($event)">
                 @if(startScreen) {
                     <div class="absolute w-full h-full flex flex-col justify-center items-center bg-[#d47108] 
-                        md:border-4 sm:border-3 border-2 border-[#d47108] 
-                        sm:rounded-[16rem] rounded-[4rem] md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
+                        md:border-4 sm:border-3 border-2 phone-landscape:border-2 border-[#d47108] 
+                        sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                         sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)] 
-                        shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] backface-hidden">
+                        shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] phone-landscape:shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] backface-hidden">
                         <div class="flex flex-col justify-center items-center gap-4 pl-24 pr-24 text-center">
-                            <span class="md:text-2xl sm:text-xl text-lg">
+                            <span class="md:text-2xl sm:text-xl text-lg phone-landscape:text-lg">
                                 {{ getRemainingQuestionsCount() }} Fragen
                             </span>
                         </div>
                     </div>
                 } @else {
-                    <div class="absolute w-full h-full flex flex-col justify-center items-start sm:rounded-[16rem] rounded-[4rem] backface-hidden">
+                    <div class="absolute w-full h-full flex flex-col justify-center items-start sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] backface-hidden">
                         @if (!isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="answerContent"></ng-container>
                         }
                     </div>
 
-                    <div class="absolute w-full h-full flex flex-col justify-center items-start sm:rounded-[16rem] rounded-[4rem] rotate-x-180 backface-hidden">
+                    <div class="absolute w-full h-full flex flex-col justify-center items-start sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] rotate-x-180 backface-hidden">
                         @if (isQuestionSide) {
                             <ng-container [ngTemplateOutlet]="answerContent"></ng-container>
                         }
@@ -78,27 +83,27 @@
     </div>
 
     <ng-template #questionContent>
-        <div class="relative h-full w-full overflow-hidden sm:rounded-[16rem] rounded-[4rem]">
+        <div class="relative h-full w-full overflow-hidden sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem]">
 
-            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat sm:rounded-[16rem] rounded-[3.75rem] sm:m-3 m-2.5" 
+            <div class="absolute inset-0 bg-cover bg-center bg-no-repeat sm:rounded-[16rem] rounded-[3.75rem] phone-landscape:rounded-[3.75rem] sm:m-3 m-2.5 phone-landscape:m-2.5" 
                 [class.opacity-30]="currentQuestion?.question?.transparent || currentQuestion?.question?.category?.transparent || !currentQuestion?.question?.image"
                 [style.background-image]="background(currentQuestion)">
             </div>
 
             <div class="relative flex flex-col justify-between items-center gap-4 
-                md:py-6 sm:py-5 py-3 md:px-24 sm:px-18 px-6 text-center h-full w-full">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100 select-none">
+                md:py-6 sm:py-5 py-3 md:px-24 sm:px-18 px-6 text-center h-full w-full phone-landscape:py-3 phone-landscape:px-6">
+                <span class="md:text-2xl sm:text-xl text-md phone-landscape:text-base text-shadow-lg/100 select-none">
                     Frage {{ (currentQuestion?.answered_questions ?? 0) + 1 }} / {{ currentQuestion?.total_questions }}
                 </span>
                 <div class="flex flex-col items-center justify-center">
-                    <span class="md:text-3xl sm:text-2xl text-xl text-shadow-lg/100 select-none">
+                    <span class="md:text-3xl sm:text-2xl text-xl phone-landscape:text-xl text-shadow-lg/100 select-none">
                         {{ currentQuestion?.question?.title }}
                     </span>
-                    <span class="md:text-xl sm:text-lg text-md text-shadow-lg/100 select-none">
+                    <span class="md:text-xl sm:text-lg text-md phone-landscape:text-base text-shadow-lg/100 select-none">
                         {{ currentQuestion?.question?.description }}
                     </span>
                 </div>
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-lg/100 select-none">
+                <span class="md:text-2xl sm:text-xl text-md phone-landscape:text-base text-shadow-lg/100 select-none">
                     {{ currentQuestion?.question?.category?.title }}
                 </span>
             </div>
@@ -106,78 +111,82 @@
     </ng-template>
 
     <ng-template #answerContent>
-        <div class="relative grid grid-cols-2 grid-rows-2 h-96 w-full gap-4 place-items-center">
+        <div class="relative grid grid-cols-2 grid-rows-2 h-96 w-full gap-4 place-items-center phone-landscape:gap-2">
 
             <!-- Answer 0 -->
             <div (click)="answer(0)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
-                md:border-4 sm:border-3 border-2 border-[#d47108]
-                sm:rounded-[16rem] rounded-[4rem] sm:rounded-tr-3xl rounded-tr-2xl sm:rounded-bl-3xl rounded-bl-2xl
+                md:border-4 sm:border-3 border-2 phone-landscape:border-2 border-[#d47108]
+                sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] sm:rounded-tr-3xl rounded-tr-2xl sm:rounded-bl-3xl rounded-bl-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
-                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] 
+                phone-landscape:shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 0 && selectedAnswerCorrect"
                 [class.highlight-pending]="selectedAnswerIdx === 0 && selectedAnswerCorrect === null"
                 [class.highlight-red]="selectedAnswerIdx === 0 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 0 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
+                <span class="md:text-2xl sm:text-xl text-md phone-landscape:text-base text-shadow-md/50 text-white select-none text-center sm:px-8 px-2 phone-landscape:px-2">
                     {{ currentQuestion?.question?.answers?.[0]?.text }}
                 </span>
             </div>
 
             <!-- Answer 1 -->
             <div (click)="answer(1)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
-                md:border-4 sm:border-3 border-2 border-[#d47108]
-                sm:rounded-[16rem] rounded-[4rem] sm:rounded-tl-3xl rounded-tl-2xl sm:rounded-br-3xl rounded-br-2xl
+                md:border-4 sm:border-3 border-2 phone-landscape:border-2 border-[#d47108]
+                sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] sm:rounded-tl-3xl rounded-tl-2xl sm:rounded-br-3xl rounded-br-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
-                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] 
+                phone-landscape:shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 1 && selectedAnswerCorrect"
                 [class.highlight-pending]="selectedAnswerIdx === 1 && selectedAnswerCorrect === null"
                 [class.highlight-red]="selectedAnswerIdx === 1 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 1 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
+                <span class="md:text-2xl sm:text-xl text-md phone-landscape:text-base text-shadow-md/50 text-white select-none text-center sm:px-8 px-2 phone-landscape:px-2">
                     {{ currentQuestion?.question?.answers?.[1]?.text }}
                 </span>
             </div>
 
             <!-- Answer 2 -->
             <div (click)="answer(2)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
-                md:border-4 sm:border-3 border-2 border-[#d47108]
-                sm:rounded-[16rem] rounded-[4rem] sm:rounded-br-3xl rounded-br-2xl sm:rounded-tl-3xl rounded-tl-2xl
+                md:border-4 sm:border-3 border-2 phone-landscape:border-2 border-[#d47108]
+                sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] sm:rounded-br-3xl rounded-br-2xl sm:rounded-tl-3xl rounded-tl-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
-                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] 
+                phone-landscape:shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 2 && selectedAnswerCorrect"
                 [class.highlight-pending]="selectedAnswerIdx === 2 && selectedAnswerCorrect === null"
                 [class.highlight-red]="selectedAnswerIdx === 2 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 2 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
+                <span class="md:text-2xl sm:text-xl text-md phone-landscape:text-base text-shadow-md/50 text-white select-none text-center sm:px-8 px-2 phone-landscape:px-2">
                     {{ currentQuestion?.question?.answers?.[2]?.text }}
                 </span>
             </div>
 
             <!-- Answer 3 -->
             <div (click)="answer(3)" class="flex justify-center items-center h-full w-full bg-[#d47108] 
-                md:border-4 sm:border-3 border-2 border-[#d47108]
-                sm:rounded-[16rem] rounded-[4rem] sm:rounded-bl-3xl rounded-bl-2xl sm:rounded-tr-3xl rounded-tr-2xl
+                md:border-4 sm:border-3 border-2 phone-landscape:border-2 border-[#d47108]
+                sm:rounded-[16rem] rounded-[4rem] phone-landscape:rounded-[4rem] sm:rounded-bl-3xl rounded-bl-2xl sm:rounded-tr-3xl rounded-tr-2xl
                 md:shadow-[inset_0_0_0_5px_#1c1c1c,0_0_5px_rgba(255,255,255,0.5)] 
                 sm:shadow-[inset_0_0_0_4px_#1c1c1c,0_0_4px_rgba(255,255,255,0.5)]
-                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
+                shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] 
+                phone-landscape:shadow-[inset_0_0_0_3px_#1c1c1c,0_0_3px_rgba(255,255,255,0.5)] transition"
                 [class.cursor-pointer]="!timePaused || !timeRunning"
                 [class.highlight-green]="selectedAnswerIdx === 3 && selectedAnswerCorrect"
                 [class.highlight-pending]="selectedAnswerIdx === 3 && selectedAnswerCorrect === null"
                 [class.highlight-red]="selectedAnswerIdx === 3 && selectedAnswerCorrect === false"
                 [class.highlight-blue]="!selectedAnswerCorrect && correctAnswerIdx === 3 && showCorrectAnswer">
-                <span class="md:text-2xl sm:text-xl text-md text-shadow-md/50 text-white select-none text-center sm:px-8 px-2">
+                <span class="md:text-2xl sm:text-xl text-md phone-landscape:text-base text-shadow-md/50 text-white select-none text-center sm:px-8 px-2 phone-landscape:px-2">
                     {{ currentQuestion?.question?.answers?.[3]?.text }}
                 </span>
             </div>
 
             <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <div class="flex justify-center items-center md:text-4xl sm:text-3xl text-xl text-white text-shadow-md/100 font-bold">
+                <div class="flex justify-center items-center md:text-4xl sm:text-3xl text-xl phone-landscape:text-sm text-white text-shadow-md/100 font-bold">
                     <span #counter class="counter">{{ formattedTime }}</span>
                 </div>
             </div>

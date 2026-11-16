@@ -1,54 +1,55 @@
 <div class="h-full w-full flex">
-    <div class="absolute sm:top-8 sm:left-8 top-4 left-4 flex justify-center items-center">
+    <div class="absolute sm:top-8 sm:left-8 top-4 left-4 phone-landscape:top-4 phone-landscape:left-4 flex justify-center items-center">
         <button (click)="nav.menu()"
-            class="back flex justify-center items-center sm:h-8 h-7 sm:w-20 w-16 bg-[#1c1c1c] sm:border-2 border border-[#d47108] rounded-full
-            sm:text-md text-sm leading-none text-shadow-md/30 hover:text-shadow-md/5 text-white font-bold antialiased pointer pt-0.5">
+            class="back flex justify-center items-center sm:h-8 h-7 phone-landscape:h-7 sm:w-20 w-16 phone-landscape:w-16 bg-[#1c1c1c] sm:border-2 border phone-landscape:border border-[#d47108] rounded-full
+            sm:text-md text-sm phone-landscape:text-sm leading-none text-shadow-md/30 hover:text-shadow-md/5 text-white font-bold antialiased pointer pt-0.5">
             Menu
         </button>
     </div>
 
-    <div class="flex flex-col justify-start items-center min-h-dvh w-full sm:gap-12 gap-6 text-white
-        sm:pt-[12vh] sm:pb-16 py-16 sm:px-6 px-4">
-        <div class="flex flex-col items-center gap-2 text-center">
-            <h1 class="sm:text-5xl text-3xl font-bold text-shadow-lg/100">{{ quiz?.title }}</h1>
+    <div class="flex flex-col justify-start items-center min-h-dvh w-full sm:gap-12 gap-6 phone-landscape:gap-4 text-white
+        sm:pt-[12vh] sm:pb-16 py-16 sm:px-6 px-4 phone-landscape:pt-[4vh] phone-landscape:pb-10 phone-landscape:px-4">
+        <div class="flex flex-col items-center gap-2 phone-landscape:gap-1 text-center">
+            <h1 class="sm:text-5xl text-3xl phone-landscape:text-2xl font-bold text-shadow-lg/100">{{ quiz?.title }}</h1>
             @if (quiz?.description) {
-                <p class="sm:text-xl text-md text-shadow-md/50">{{ quiz?.description }}</p>
+                <p class="sm:text-xl text-md phone-landscape:text-base text-shadow-md/50">{{ quiz?.description }}</p>
             }
             @if (quiz) {
-                <span class="sm:text-xl text-md text-[#d47108] font-bold text-shadow-md/50">{{ quiz.question_count }} Fragen</span>
+                <span class="sm:text-xl text-md phone-landscape:text-base text-[#d47108] font-bold text-shadow-md/50">{{ quiz.question_count }} Fragen</span>
             }
         </div>
 
         @if (!player) {
             <input [(ngModel)]="playerName" type="text" placeholder="Dein Name..." minlength="3" maxlength="25" #nameInput="ngModel"
                 required (keydown.enter)="register(nameInput)"
-                class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
-                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50
-                text-white font-bold antialiased pointer pt-0.5 text-center" />
+                class="flex justify-center items-center md:h-22 sm:h-19 h-16 phone-landscape:h-16 md:w-108 sm:w-100 w-full phone-landscape:w-full
+                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg phone-landscape:text-lg leading-none text-shadow-md/50
+                text-white font-bold antialiased pointer pt-0.5 text-center md:shadow-[inset_0_0_0_5px_#d47108,0_0_5px_rgba(255,255,255,0.5)]
+                shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)] phone-landscape:shadow-[inset_0_0_0_3px_#d47108,0_0_3px_rgba(255,255,255,0.5)]" />
             <button (click)="register(nameInput)" type="button" [disabled]="nameInput.invalid || !playerName.trim() || joining"
-                class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full bg-[#1c1c1c] rounded-full
-                md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold
+                class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 phone-landscape:h-16 md:w-108 sm:w-100 w-full phone-landscape:w-full bg-[#1c1c1c] rounded-full
+                md:text-2xl sm:text-xl text-lg phone-landscape:text-lg leading-none text-shadow-md/50 hover:text-shadow-md/10 text-white font-bold
                 antialiased pointer pt-0.5 hover:pt-1 disabled:pt-0.5">
                 Starten
             </button>
         } @else {
             <input [value]="player" type="text" [disabled]="true"
-                class="flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
-                bg-[#d47108] border-6 border-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none
+                class="flex justify-center items-center md:h-22 sm:h-19 h-16 phone-landscape:h-16 md:w-108 sm:w-100 w-full phone-landscape:w-full
+                bg-[#d47108] border-6 border-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg phone-landscape:text-lg leading-none
                 text-[#1c1c1c] font-bold antialiased pointer pt-0.5 text-center" />
             <button (click)="play()" type="button"
-                class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
-                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50
+                class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 phone-landscape:h-16 md:w-108 sm:w-100 w-full phone-landscape:w-full
+                bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg phone-landscape:text-lg leading-none text-shadow-md/50
                 hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
                 Quiz starten
             </button>
         }
 
-        <div class="md:w-175 sm:w-135 w-full h-px sm:my-2 my-1 bg-linear-to-r from-transparent via-[#d47108]/60 to-transparent"></div>
+        <div class="md:w-175 sm:w-135 w-full h-px sm:my-2 my-1 phone-landscape:my-1 bg-linear-to-r from-transparent via-[#d47108]/60 to-transparent"></div>
 
         <button (click)="nav.score(quizId)" type="button"
-            class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 md:w-108 sm:w-100 w-full
-            bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg leading-none text-shadow-md/50
+            class="pill flex justify-center items-center md:h-22 sm:h-19 h-16 phone-landscape:h-16 md:w-108 sm:w-100 w-full phone-landscape:w-full
+            bg-[#1c1c1c] rounded-full md:text-2xl sm:text-xl text-lg phone-landscape:text-lg leading-none text-shadow-md/50
             hover:text-shadow-md/10 text-white font-bold antialiased pointer pt-0.5 hover:pt-1">
             Scoreboard
         </button>

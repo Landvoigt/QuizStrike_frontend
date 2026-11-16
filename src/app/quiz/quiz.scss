@@ -1,10 +1,9 @@
 input {
     transition: all 350ms ease-in-out;
-    box-shadow: 0 0 0 4px #d47108;
     outline: none;
 
     &:focus {
-        box-shadow: 0 0 0 4px white;
+        box-shadow: 0 0 0 5px white;
     }
 }
 
@@ -54,6 +53,17 @@ input {
 .pill:disabled::before {
     transform: none !important;
 }
+
+@media (width < 48rem), (orientation: landscape) and (max-height: 32rem) {
+    input:focus {
+        box-shadow: 0 0 0 3px white;
+    }
+
+    .pill {
+        box-shadow: 0 0 0 3px #d47108;
+    }
+}
+
 .back {
     z-index: 1;
     position: relative;
