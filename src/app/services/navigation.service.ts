@@ -41,6 +41,11 @@ export class NavigationService {
     return this.router.url.endsWith('/play');
   }
 
+  /** True while on the quiz overview. */
+  isMenu(): boolean {
+    return this.router.url.split(/[?#]/)[0] === '/';
+  }
+
   /** Opens quiz overview. */
   menu() {
     this.router.navigate(['']);
