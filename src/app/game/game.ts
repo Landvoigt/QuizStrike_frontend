@@ -68,7 +68,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.quizId = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!this.getPlayer()) {
-      this.finishQuiz();
+      this.abortGame();
       return;
     }
 
@@ -77,7 +77,7 @@ export class GameComponent implements OnInit, OnDestroy {
 
     if (!this.gameService.getGame(this.quizId)) {
       this.gameService.restore(this.quizId).subscribe((game) => {
-        if (!game) this.finishQuiz();
+        if (!game) this.abortGame();
       });
     }
   }
@@ -87,7 +87,7 @@ export class GameComponent implements OnInit, OnDestroy {
     if (!game) return;
 
     if (this.gameService.isCompleted(game)) {
-      this.finishQuiz();
+      this.completeGame();
       return;
     }
 
@@ -100,7 +100,7 @@ export class GameComponent implements OnInit, OnDestroy {
     await this.nextStep();
   }
 
-  /** Loads next question and flips to it; menu when quiz completed. */
+  /** Loads next question and flips to it; scoreboard when quiz completed. */
   async nextStep(): Promise<void> {
     if (!this.game || this.inProgress() || this.isStarted) return;
 
@@ -110,7 +110,7 @@ export class GameComponent implements OnInit, OnDestroy {
     if (!response) return;
 
     if (response.quiz_completed) {
-      this.finishQuiz();
+      this.completeGame();
       return;
     }
 
@@ -135,10 +135,16 @@ export class GameComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Clears running quiz, back to quiz page. */
-  finishQuiz(): void {
+  /** Game cannot continue (no player, bad token, quiz gone): back to quiz page. */
+  abortGame(): void {
     this.gameService.clearRunningQuiz();
     this.nav.quiz(this.quizId);
+  }
+
+  /** All questions answered: forgets player + token, opens scoreboard. */
+  completeGame(): void {
+    this.gameService.leave(this.quizId, { dropToken: true });
+    this.nav.score(this.quizId);
   }
 
   /** Preloads image, resets state, flips to question. */
@@ -262,7 +268,7 @@ export class GameComponent implements OnInit, OnDestroy {
     this.stopTimer();
     this.gameService.leave(this.quizId, { dropToken: true });
     this.error.handleError(this.error.INVALID_TOKEN);
-    this.finishQuiz();
+    this.abortGame();
   }
 
   /** Starts display loop + timeout deadline. */

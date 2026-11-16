@@ -81,11 +81,12 @@ export class QuizComponent implements OnInit, OnDestroy {
       });
   }
 
-  /** Opens game, or shows error if all questions answered. */
+  /** Opens game; if already completed forgets player and shows error. */
   onJoined(game: Interfaces.Game): void {
     this.switching = false;
 
     if (this.gameService.isCompleted(game)) {
+      this.gameService.leave(this.quizId, { dropToken: true });
       this.error.handleError(this.error.GAME_FINISHED);
       return;
     }
