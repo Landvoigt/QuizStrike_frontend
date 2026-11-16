@@ -19,12 +19,10 @@ import * as Interfaces from '../interfaces';
 export class QuizComponent implements OnInit, OnDestroy {
   quizId: number = 0;
   quiz: Interfaces.Quiz | null = null;
-  game: Interfaces.Game | null = null;
 
   player: string = '';
   playerName: string = '';
   joining: boolean = false;
-  switching: boolean = false;
 
   private subs = new Subscription();
 
@@ -44,7 +42,7 @@ export class QuizComponent implements OnInit, OnDestroy {
     }
 
     this.subs.add(this.gameService.quiz$(this.quizId).subscribe((quiz) => this.onQuizLoaded(quiz)));
-    this.subs.add(this.gameService.games$.subscribe((games) => this.onGamesChanged(games)));
+    this.subs.add(this.gameService.games$.subscribe(() => this.onGamesChanged()));
 
     this.gameService.restore(this.quizId).subscribe();
   }
@@ -60,9 +58,8 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  /** Syncs game + player of this quiz. */
-  onGamesChanged(games: Record<number, Interfaces.Game>): void {
-    this.game = games[this.quizId] ?? null;
+  /** Syncs stored player of this quiz. */
+  onGamesChanged(): void {
     this.player = this.gameService.getPlayer(this.quizId);
     this.cdr.detectChanges();
   }
@@ -83,8 +80,6 @@ export class QuizComponent implements OnInit, OnDestroy {
 
   /** Opens game; if already completed forgets player and shows error. */
   onJoined(game: Interfaces.Game): void {
-    this.switching = false;
-
     if (this.gameService.isCompleted(game)) {
       this.gameService.leave(this.quizId, { dropToken: true });
       this.error.handleError(this.error.GAME_FINISHED);
@@ -111,17 +106,6 @@ export class QuizComponent implements OnInit, OnDestroy {
   /** Opens game of this quiz. */
   play(): void {
     this.nav.game(this.quizId);
-  }
-
-  /** Shows name input; stored player + token stay. */
-  newPlayer(): void {
-    this.switching = true;
-    this.playerName = '';
-  }
-
-  /** Back to stored player. */
-  cancelNewPlayer(): void {
-    this.switching = false;
   }
 
   /** Stops listeners. */
